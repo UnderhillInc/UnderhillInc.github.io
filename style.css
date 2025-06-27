@@ -1,0 +1,207 @@
+/* --- Basic Setup & Color Palette --- */
+:root {
+    --teletext-bg: #000000;
+    --teletext-blue: #0000ff;
+    --teletext-cyan: #00ffff;
+    --teletext-yellow: #ffff00;
+    --teletext-white: #ffffff;
+    --teletext-green: #00ff00;
+    --teletext-red: #ff0000;
+}
+
+body {
+    background-color: var(--teletext-bg);
+    color: var(--teletext-white);
+    font-family: 'VT323', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 1.5rem;
+    font-size: 22px;
+    overflow-x: hidden;
+}
+
+/* --- Main Container & Retro Effects --- */
+.teletext-container {
+    width: 100%;
+    max-width: 1200px;
+    border: 2px solid var(--teletext-blue);
+    background-color: var(--teletext-bg);
+    padding: 15px;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.2);
+    position: relative;
+    animation: tv-hum 2s linear infinite alternate;
+}
+
+.scanline-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(to bottom, transparent, transparent 1px, rgba(0, 0, 0, 0.3) 1px, rgba(0, 0, 0, 0.3) 2px);
+    pointer-events: none; z-index: 3;
+}
+
+body::after {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 10;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+}
+
+/* --- Header & Footer --- */
+.masthead {
+    text-align: center;
+    padding-bottom: 5px;
+    border-bottom: 4px double var(--teletext-cyan);
+    margin-bottom: 10px;
+}
+.masthead h1 {
+    font-size: 3.5em;
+    color: var(--teletext-yellow);
+    margin: 0;
+    text-shadow: 3px 3px var(--teletext-red);
+}
+.masthead .sub-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1em;
+    color: var(--teletext-cyan);
+    padding: 0 5px;
+}
+.page-footer {
+    border-top: 4px double var(--teletext-cyan);
+    padding: 8px 5px 5px 5px;
+    margin-top: 10px;
+    color: var(--teletext-yellow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#music-control {
+    background: var(--teletext-yellow);
+    color: var(--teletext-blue);
+    border: none;
+    cursor: pointer;
+    padding: 0 8px;
+    font-family: 'VT323', monospace;
+    font-size: 1em;
+}
+
+/* --- Layout Grid & Newspaper Columns --- */
+.main-content {
+    display: grid;
+    grid-template-columns: 3fr 1.2fr;
+    gap: 20px;
+}
+
+.newspaper-columns {
+    column-count: 2;
+    column-gap: 20px;
+    column-fill: auto;
+    border-right: 2px solid var(--teletext-blue);
+    padding-right: 20px;
+}
+
+.news-outlet {
+    break-inside: avoid;
+    margin-bottom: 20px;
+}
+
+/* --- Section Styling --- */
+.news-outlet h2, .info-box h2 {
+    background-color: var(--teletext-blue);
+    color: var(--teletext-yellow);
+    padding: 3px 8px;
+    margin: 0 0 10px 0;
+    font-size: 1.4em;
+    display: flex;
+    justify-content: space-between;
+}
+
+.news-outlet ul, .info-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.news-outlet li {
+    margin-bottom: 1em;
+    line-height: 1.1;
+}
+
+.headline-number { color: var(--teletext-yellow); margin-right: 10px; }
+.headline-text { color: var(--teletext-cyan); }
+.headline-text a { color: var(--teletext-white); text-decoration: none; }
+.headline-text a:hover { background-color: var(--teletext-cyan); color: var(--teletext-blue); }
+
+/* --- Sidebar Specifics & Weather --- */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.flight-info li { margin-bottom: 0.7em; }
+.weather-info { color: var(--teletext-white); line-height: 1.3; font-size: 0.9em; }
+.weather-info strong { color: var(--teletext-yellow); }
+
+.weather-art-box {
+    background-color: var(--teletext-blue);
+    color: var(--teletext-yellow);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 2px solid var(--teletext-cyan);
+    min-height: 110px; /* Reserve space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#weather-icon {
+    font-size: 80px; /* Make the icon large */
+    line-height: 1;
+}
+
+/* --- Advertisements --- */
+.ad-banner-top {
+    background: var(--teletext-yellow);
+    color: var(--teletext-blue);
+    text-align: center;
+    padding: 5px;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.ad-box-sidebar {
+    border: 2px dashed var(--teletext-red);
+    padding: 10px;
+    text-align: center;
+}
+.ad-box-sidebar h3 {
+    color: var(--teletext-yellow);
+    background-color: var(--teletext-red);
+    padding: 2px 0;
+    margin: -10px -10px 10px -10px;
+    font-size: 1.2em;
+}
+.ad-box-sidebar p { margin: 0 0 10px 0; font-size: 1.1em; }
+.ad-box-sidebar .price { font-size: 1.6em; color: var(--teletext-green); font-weight: bold; }
+
+/* --- Utility & Animations --- */
+.loading-message, .error-message { padding: 10px; }
+.loading-message { color: var(--teletext-yellow); }
+.error-message { color: var(--teletext-red); }
+
+.blinking { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { color: var(--teletext-red); } }
+
+.blinking-cursor { animation: cursor-blink 1s step-end infinite; }
+@keyframes cursor-blink { 50% { opacity: 0; } }
+
+@keyframes flicker { 0%{opacity:0.25}10%{opacity:0.4}20%{opacity:0.25}30%{opacity:0.5}40%{opacity:0.3}50%{opacity:0.6}60%{opacity:0.35}70%{opacity:0.5}80%{opacity:0.45}90%{opacity:0.6}100%{opacity:0.5} }
+@keyframes tv-hum { from {transform: scale(1.001, 1.002);} to {transform: scale(1, 1);} }

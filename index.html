@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Daily Teletext</title>
+    <!-- Google Fonts for the retro 'VT323' font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <!-- Weather Icons font for the new weather display -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main container for the entire teletext screen -->
+    <div class="teletext-container">
+        <!-- Overlay to simulate CRT scanlines -->
+        <div class="scanline-overlay"></div>
+
+        <!-- Header section with the main title and clock -->
+        <header class="masthead">
+            <h1>The Daily Teletext</h1>
+            <div class="sub-header">
+                <span id="news-source">Live Feed</span>
+                <span id="clock">--:--:--</span>
+            </div>
+        </header>
+
+        <!-- Top banner advertisement -->
+        <div class="ad-banner-top">
+            Teletext: The Future of News... Yesterday! -- <span class="blinking">ALWAYS ON</span>
+        </div>
+
+        <!-- Main content area, split into news columns and a sidebar -->
+        <main class="main-content">
+            <!-- The multi-column layout for news articles, populated by script.js -->
+            <div class="newspaper-columns" id="newspaper-columns">
+                <!-- News outlets will be dynamically inserted here -->
+            </div>
+            
+            <!-- The right-hand sidebar for weather, flights, and other info -->
+            <aside class="sidebar">
+                <section class="info-box" id="weather">
+                    <h2><span>Weather</span> <span>p.201</span></h2>
+                    <div class="weather-art-box">
+                        <!-- Weather icon will be placed here -->
+                        <i id="weather-icon" class="wi"></i>
+                    </div>
+                    <div id="weather-content" class="weather-info"></div>
+                </section>
+                <section class="info-box" id="flights">
+                    <h2><span>Heathrow Departures</span> <span>p.701</span></h2>
+                    <ul id="flights-list" class="flight-info"></ul>
+                </section>
+                <div class="ad-box-sidebar">
+                    <h3>TELETEXT HOLIDAYS</h3>
+                    <p>7 NIGHTS IN THE SUN</p>
+                    <p class="price">ONLY £249!</p>
+                    <p>SEE PAGE 357 FOR MORE</p>
+                </div>
+            </aside>
+        </main>
+        
+        <!-- Footer section -->
+        <footer class="page-footer">
+             <div id="footer-text">STATUS: CONNECTING...</div>
+             <button id="music-control">MUSIC OFF</button>
+        </footer>
+    </div>
+    
+    <!-- Audio element for background music -->
+    <audio id="background-music" src="#" loop></audio>
+    
+    <!-- Link to the external JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
