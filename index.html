@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Daily Teletext</title>
-    <!-- Google Fonts for the retro 'VT323' font -->
+    <!-- Google Fonts for retro 'VT323' and blocky 'Press Start 2P' -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    <!-- Weather Icons font for the new weather display -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <!-- Weather Icons font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
     <!-- Link to the external CSS file -->
     <link rel="stylesheet" href="style.css">
@@ -33,11 +33,12 @@
             Teletext: The Future of News... Yesterday! -- <span class="blinking">ALWAYS ON</span>
         </div>
 
-        <!-- Main content area, split into news columns and a sidebar -->
+        <!-- Main content area, split into a main column and a sidebar -->
         <main class="main-content">
-            <!-- The multi-column layout for news articles, populated by script.js -->
-            <div class="newspaper-columns" id="newspaper-columns">
-                <!-- News outlets will be dynamically inserted here -->
+            <!-- Main column for news articles -->
+            <div class="main-news-column" id="main-news-column">
+                <!-- Lead Story and other news outlets will be dynamically inserted here by script.js -->
+                 <div class="loading-message">Fetching headlines... <span class="blinking-cursor">_</span></div>
             </div>
             
             <!-- The right-hand sidebar for weather, flights, and other info -->
@@ -45,7 +46,6 @@
                 <section class="info-box" id="weather">
                     <h2><span>Weather</span> <span>p.201</span></h2>
                     <div class="weather-art-box">
-                        <!-- Weather icon will be placed here -->
                         <i id="weather-icon" class="wi"></i>
                     </div>
                     <div id="weather-content" class="weather-info"></div>
