@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OfficeWave - Homepage</title>
-    <!-- Link to the external CSS file -->
+    <title>OfficeWave - Misc</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
@@ -22,7 +21,7 @@
                 </div>
             </div>
             <div class="content-wrapper">
-                <!-- Navigation using anchor tags for multiple pages -->
+                <!-- Navigation -->
                 <nav class="flex flex-wrap gap-2 md:space-x-4 mb-6 pb-4 border-b-2 border-dashed border-purple-400/50">
                     <a href="index.html" class="nav-button">Homepage</a>
                     <a href="projects.html" class="nav-button">Projects</a>
@@ -34,11 +33,14 @@
 
                 <!-- Page Content -->
                 <main id="page-content">
-                    <!-- Homepage -->
-                    <div id="homepage">
-                        <h1 class="text-2xl font-bold mb-4">Live News Feed<span class="blinking-cursor border-r-2"></span></h1>
-                        <div id="news-feed" class="space-y-4">
-                            <p>Initializing data stream...</p>
+                     <!-- Misc Page -->
+                    <div id="misc">
+                        <div class="flex justify-between items-center mb-4">
+                            <h1 class="text-2xl font-bold">Data Fragments</h1>
+                            <button id="add-post-btn" class="action-button hidden">Inject Data</button>
+                        </div>
+                        <div id="misc-content">
+                            <!-- Posts will be loaded here by JavaScript -->
                         </div>
                     </div>
                 </main>
@@ -51,9 +53,8 @@
         </div>
     </div>
 
-    <!-- Shared elements like Modals and Audio Player -->
+    <!-- Shared elements -->
     <audio id="background-music" loop>
-        <!-- The path is relative to the HTML file's location -->
         <source src="Officewave.mp3" type="audio/mp3">
         Your browser does not support the audio element.
     </audio>
@@ -66,7 +67,25 @@
     <div id="postModal" class="fixed inset-0 w-full h-full flex items-center justify-center hidden"><div class="window max-w-md w-full crt-effect"><div class="title-bar"><span>New Data Packet</span></div><div class="content-wrapper"><form id="post-form" class="p-4"><label for="post-text" class="block font-bold mb-1 text-teal-300">CONTENT:</label><textarea id="post-text" rows="4" class="w-full p-2 border bg-black/50 border-teal-400/50 text-white mb-4" required></textarea><label for="post-image" class="block font-bold mb-1 text-teal-300">IMAGE_URL (OPTIONAL):</label><input type="text" id="post-image" class="w-full p-2 border bg-black/50 border-teal-400/50 text-white mb-4" placeholder="path/to/image.dat"><div class="flex justify-end space-x-2"><button type="button" id="cancel-post" class="action-button">Cancel</button><button type="submit" class="action-button">Inject</button></div></form></div></div></div>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Link to the external JavaScript file -->
-    <script src="js/main.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        window.firebase = {
+            initializeApp,
+            getAuth,
+            signInAnonymously,
+            onAuthStateChanged,
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs,
+            onSnapshot
+        };
+    </script>
+    
+    <script src="js/main.js" type="module"></script>
 </body>
 </html>
