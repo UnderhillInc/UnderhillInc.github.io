@@ -3,77 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Daily Teletext</title>
-    <!-- Google Fonts for retro 'VT323' and blocky 'Press Start 2P' -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <!-- Weather Icons font -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
-    <!-- Link to the external CSS file -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- Main container for the entire teletext screen -->
-    <div class="teletext-container">
-        <!-- Overlay to simulate CRT scanlines -->
-        <div class="scanline-overlay"></div>
+    <title>OfficeWave</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0d0221;
+            /* The user requested this be named 'officebackground'. I am using one of the previously provided images. */
+            background-image: url('a7de99be-6dbe-4485-8fb5-841fe7947eb2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #d1d5db; /* Gray 300 */
+            text-shadow: 0 0 5px rgba(107, 229, 255, 0.7), 0 0 10px rgba(107, 229, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
 
-        <!-- Header section with the main title and clock -->
-        <header class="masthead">
-            <h1>The Daily Teletext</h1>
-            <div class="sub-header">
-                <span id="news-source">Live Feed</span>
-                <span id="clock">--:--:--</span>
-            </div>
-        </header>
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.9) 100%);
+            z-index: 1;
+        }
 
-        <!-- Top banner advertisement -->
-        <div class="ad-banner-top">
-            Teletext: The Future of News... Yesterday! -- <span class="blinking">ALWAYS ON</span>
-        </div>
+        .window {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;
+            max-height: 90vh;
+            border: 2px solid #2dd4bf; /* Teal 400 */
+            border-radius: 0.5rem;
+            background-color: rgba(13, 2, 33, 0.85); /* Dark blue with opacity */
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 25px rgba(45, 212, 191, 0.6), inset 0 0 15px rgba(45, 212, 191, 0.4);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+        }
 
-        <!-- Main content area, split into a main column and a sidebar -->
-        <main class="main-content">
-            <!-- Main column for news articles -->
-            <div class="main-news-column" id="main-news-column">
-                <!-- Lead Story and other news outlets will be dynamically inserted here by script.js -->
-                 <div class="loading-message">Fetching headlines... <span class="blinking-cursor">_</span></div>
-            </div>
-            
-            <!-- The right-hand sidebar for weather, flights, and other info -->
-            <aside class="sidebar">
-                <section class="info-box" id="weather">
-                    <h2><span>Weather</span> <span>p.201</span></h2>
-                    <div class="weather-art-box">
-                        <i id="weather-icon" class="wi"></i>
-                    </div>
-                    <div id="weather-content" class="weather-info"></div>
-                </section>
-                <section class="info-box" id="flights">
-                    <h2><span>Heathrow Departures</span> <span>p.701</span></h2>
-                    <ul id="flights-list" class="flight-info"></ul>
-                </section>
-                <div class="ad-box-sidebar">
-                    <h3>TELETEXT HOLIDAYS</h3>
-                    <p>7 NIGHTS IN THE SUN</p>
-                    <p class="price">ONLY £249!</p>
-                    <p>SEE PAGE 357 FOR MORE</p>
-                </div>
-            </aside>
-        </main>
+        /* CRT Scanlines and Flicker Effect */
+        .crt-effect::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 3;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.2; } 20% { opacity: 1; } 80% { opacity: 0.5; } 100% { opacity: 1; }
+        }
+
+        .title-bar {
+            background-color: rgba(45, 212, 191, 0.2);
+            color: #f9fafb;
+            padding: 0.25rem 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2dd4bf;
+            flex-shrink: 0;
+        }
+        .title-bar-buttons span {
+            display: inline-block; width: 12px; height: 12px; border-radius: 0; margin-left: 6px; border: 1px solid #2dd4bf;
+        }
+        .btn-close, .btn-min, .btn-max { background-color: rgba(45, 212, 191, 0.5); }
+
+        .content-wrapper {
+            position: relative;
+            padding: 1.5rem;
+            z-index: 4;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
         
-        <!-- Footer section -->
-        <footer class="page-footer">
-             <div id="footer-text">STATUS: CONNECTING...</div>
-             <button id="music-control">MUSIC OFF</button>
-        </footer>
+        .nav-button, .action-button {
+            border: 1px solid #a78bfa; background-color: rgba(167, 139, 250, 0.1); padding: 0.5rem 1rem; border-radius: 0.25rem; box-shadow: inset 0 0 5px rgba(167, 139, 250, 0.4); font-weight: bold; color: #d1d5db; transition: all 0.2s ease-in-out; text-shadow: 0 0 3px rgba(232, 121, 249, 0.7);
+        }
+        .nav-button:hover, .action-button:hover { background-color: rgba(167, 139, 250, 0.3); color: #fff; }
+        .nav-button:active, .action-button:active { transform: translateY(1px); box-shadow: inset 0 0 8px rgba(167, 139, 250, 0.6); }
+
+        .post, .project-item, .news-article {
+            border: 1px dashed rgba(167, 139, 250, 0.5); padding: 1rem; margin-top: 1rem; background-color: rgba(13, 2, 33, 0.6);
+        }
+        .post img { max-width: 100%; margin-top: 0.5rem; border: 1px solid #a78bfa; filter: saturate(1.2); }
+        
+        #loginModal, #postModal {
+            background-color: rgba(13, 2, 33, 0.7); backdrop-filter: blur(10px); z-index: 10;
+        }
+
+        .blinking-cursor { animation: blink 1s step-end infinite; border-right-color: #2dd4bf; }
+        @keyframes blink { from, to { border-right-color: transparent; } 50% { border-right-color: #2dd4bf; } }
+        
+        #mute-btn {
+            position: fixed; bottom: 20px; right: 20px; background: rgba(13, 2, 33, 0.7); border: 1px solid #a78bfa; border-radius: 50%; padding: 0.5rem; cursor: pointer; z-index: 100;
+        }
+        #mute-btn svg { width: 24px; height: 24px; fill: #a78bfa; }
+
+        .status-bar {
+            border-top: 1px solid #2dd4bf; background-color: rgba(45, 212, 191, 0.2); padding: 0.25rem 0.75rem; font-size: 0.75rem; display: flex; justify-content: space-between; flex-shrink: 0; z-index: 5;
+        }
+
+        .news-article a { color: #2dd4bf; text-decoration: none; }
+        .news-article a:hover { text-decoration: underline; }
+
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto w-full h-full">
+        <!-- Main Window -->
+        <div class="window crt-effect">
+            <div class="title-bar">
+                <span>TERMINAL_SESSION_01</span>
+                <div class="title-bar-buttons">
+                    <span class="btn-min"></span>
+                    <span class="btn-max"></span>
+                    <span class="btn-close"></span>
+                </div>
+            </div>
+            <div class="content-wrapper">
+                <!-- Navigation -->
+                <nav class="flex flex-wrap gap-2 md:space-x-4 mb-6 pb-4 border-b-2 border-dashed border-purple-400/50">
+                    <button id="home-btn" class="nav-button">Homepage</button>
+                    <button id="projects-btn" class="nav-button">Projects</button>
+                    <button id="misc-btn" class="nav-button">Misc</button>
+                    <div class="flex-grow"></div>
+                    <button id="login-btn" class="action-button">Admin Login</button>
+                    <button id="logout-btn" class="action-button hidden">Logout</button>
+                </nav>
+
+                <!-- Page Content -->
+                <main id="page-content">
+                    <!-- Homepage -->
+                    <div id="homepage">
+                        <h1 class="text-2xl font-bold mb-4">Live News Feed<span class="blinking-cursor border-r-2"></span></h1>
+                        <div id="news-feed" class="space-y-4">
+                            <p>Initializing data stream...</p>
+                        </div>
+                    </div>
+
+                    <!-- Projects Page -->
+                    <div id="projects" class="hidden">
+                        <h1 class="text-2xl font-bold mb-4">Project Directory</h1>
+                        <div id="project-list" class="space-y-4">
+                            <div class="project-item">
+                                <h3 class="font-bold text-lg text-teal-300">Project: GeminiWave</h3>
+                                <p class="text-sm mt-1">Type: <span class="text-yellow-400">Interactive Web App</span></p>
+                                <p class="mt-2 text-gray-300">The very terminal you are using now. Built with retro-futuristic aesthetics.</p>
+                            </div>
+                            <div class="project-item">
+                                <h3 class="font-bold text-lg text-teal-300">Project: Pixel Runner</h3>
+                                <p class="text-sm mt-1">Type: <span class="text-fuchsia-400">Arcade Game</span></p>
+                                <p class="mt-2 text-gray-300">An upcoming endless runner game with CRT effects and a synthwave soundtrack.</p>
+                            </div>
+                             <div class="project-item">
+                                <h3 class="font-bold text-lg text-teal-300">Code Library: CRT.js</h3>
+                                <p class="text-sm mt-1">Type: <span class="text-yellow-400">JavaScript Library</span></p>
+                                <p class="mt-2 text-gray-300">A lightweight library to replicate flicker, scanlines, and glow effects on web elements.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Misc Page -->
+                    <div id="misc" class="hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h1 class="text-2xl font-bold">Data Fragments</h1>
+                            <button id="add-post-btn" class="action-button hidden">Inject Data</button>
+                        </div>
+                        <div id="misc-content">
+                            <div class="post">
+                                <p class="text-gray-300">Intercepted this from a dead data channel. The encryption is weird. Seems to be a personal log.</p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div class="status-bar">
+                <span id="ip-info">IP: ...</span>
+                <span id="location-info">Location: ...</span>
+                <span id="time-info">Time: ...</span>
+            </div>
+        </div>
     </div>
+
+    <!-- Audio Player -->
+    <audio id="background-music" loop autoplay>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <button id="mute-btn" title="Toggle Music">
+        <svg id="volume-on-icon" viewBox="0 0 24 24"><path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM16.5 12c0-1.77-1-3.29-2.5-4.03v8.05c1.5-0.74 2.5-2.26 2.5-4.02zM3 9v6h4l5 5V4L7 9H3z"/></svg>
+        <svg id="volume-off-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+    </button>
     
-    <!-- Audio element for background music -->
-    <audio id="background-music" src="#" loop></audio>
-    
-    <!-- Link to the external JavaScript file -->
-    <script src="script.js"></script>
+    <!-- Modals (unchanged from previous version) -->
+    <div id="loginModal" class="fixed inset-0 w-full h-full flex items-center justify-center hidden"><div class="window max-w-sm w-full crt-effect"><div class="title-bar"><span>AUTHENTICATION REQUIRED</span></div><div class="content"><form id="login-form"><label for="username" class="block font-bold mb-1 text-teal-300">USER_ID:</label><input type="text" id="username" class="w-full p-2 border bg-black/50 border-teal-400/50 text-white mb-4" required><label for="password" class="block font-bold mb-1 text-teal-300">PASSCODE:</label><input type="password" id="password" class="w-full p-2 border bg-black/50 border-teal-400/50 text-white mb-4" required><div class="flex justify-end space-x-2"><button type="button" id="cancel-login" class="action-button">Abort</button><button type="submit" class="action-button">Connect</button></div><p id="login-error" class="text-red-400 text-sm mt-2 hidden">> ACCESS DENIED: INVALID CREDENTIALS</p></form></div></div></div>
+    <div id="postModal" class="fixed inset-0 w-full h-full flex items-center justify-center hidden"><div class="window max-w-md w-full crt-effect"><div class="title-bar"><span>New Data Packet</span></div><div class="content"><form id="post-form"><label for="post-text" class="block font-bold mb-1 text-teal-300">CONTENT:</label><textarea id="post-text" rows="4" class="w-full p-2 border bg-black/50 border-teal-400/50 text-white mb-4" required></textarea><label for="post-image" class="block font-bold mb-1 text-teal-300">IMAGE_URL (OPTIONAL):</label><input type="text" id="post-image" class="w-full p-2 border bg-black/50 border-teal-400/50 text-white mb-4" placeholder="path/to/image.dat"><div class="flex justify-end space-x-2"><button type="button" id="cancel-post" class="action-button">Cancel</button><button type="submit" class="action-button">Inject</button></div></form></div></div></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- State & Config ---
+            let isAdminLoggedIn = false;
+            const GNEWS_API_KEY = '49b135654e17bcdff699bb810e7d3686';
+
+            // --- Page Elements ---
+            const pages = { homepage: document.getElementById('homepage'), projects: document.getElementById('projects'), misc: document.getElementById('misc') };
+            const navButtons = { home: document.getElementById('home-btn'), projects: document.getElementById('projects-btn'), misc: document.getElementById('misc-btn') };
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const addPostBtn = document.getElementById('add-post-btn');
+            const loginModal = document.getElementById('loginModal');
+            const postModal = document.getElementById('postModal');
+            const loginForm = document.getElementById('login-form');
+            const postForm = document.getElementById('post-form');
+            const cancelLoginBtn = document.getElementById('cancel-login');
+            const cancelPostBtn = document.getElementById('cancel-post');
+            const loginError = document.getElementById('login-error');
+            const miscContent = document.getElementById('misc-content');
+            const audio = document.getElementById('background-music');
+            const muteBtn = document.getElementById('mute-btn');
+            const volumeOnIcon = document.getElementById('volume-on-icon');
+            const volumeOffIcon = document.getElementById('volume-off-icon');
+
+            // --- Dynamic Content Elements ---
+            const ipInfo = document.getElementById('ip-info');
+            const locationInfo = document.getElementById('location-info');
+            const timeInfo = document.getElementById('time-info');
+            const newsFeed = document.getElementById('news-feed');
+
+            // --- Functions ---
+            
+            /**
+             * Updates the time display every second.
+             */
+            function updateTime() {
+                const now = new Date();
+                timeInfo.textContent = `Time: ${now.toLocaleString()}`;
+            }
+
+            /**
+             * Fetches user's IP and Location data.
+             */
+            async function fetchSystemInfo() {
+                try {
+                    // FIX: Changed URL to use HTTPS to prevent mixed-content errors.
+                    const response = await fetch('https://ip-api.com/json');
+                    if (!response.ok) throw new Error('Network response was not ok.');
+                    const data = await response.json();
+                    ipInfo.textContent = `IP: ${data.query}`;
+                    locationInfo.textContent = `Location: ${data.city}, ${data.country}`;
+                } catch (error) {
+                    console.error("Failed to fetch system info:", error);
+                    ipInfo.textContent = 'IP: UNKNOWN';
+                    locationInfo.textContent = 'Location: Peterlee, England'; // Fallback
+                }
+            }
+
+            /**
+             * Fetches top news headlines from GNews.
+             */
+            async function fetchNews() {
+                const url = `https://gnews.io/api/v4/top-headlines?lang=en&token=${GNEWS_API_KEY}`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`GNews API Error: ${response.statusText}`);
+                    const data = await response.json();
+
+                    newsFeed.innerHTML = ''; // Clear loading message
+
+                    if (data.articles && data.articles.length > 0) {
+                        data.articles.slice(0, 10).forEach(article => { // Display top 10 articles
+                            const articleElement = document.createElement('div');
+                            articleElement.className = 'news-article';
+                            articleElement.innerHTML = `
+                                <h3 class="font-bold text-lg text-teal-300">${article.title}</h3>
+                                <p class="text-sm mt-1 text-gray-400">Source: ${article.source.name}</p>
+                                <p class="mt-2 text-gray-300">${article.description}</p>
+                                <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="mt-2 inline-block">Read More >></a>
+                            `;
+                            newsFeed.appendChild(articleElement);
+                        });
+                    } else {
+                         newsFeed.innerHTML = '<p>No articles found in data stream.</p>';
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch news:", error);
+                    newsFeed.innerHTML = '<p class="text-red-400">> CRITICAL ERROR: Could not load news feed. Check connection.</p>';
+                }
+            }
+
+
+            function showPage(pageId) { Object.values(pages).forEach(page => page.classList.add('hidden')); if (pages[pageId]) { pages[pageId].classList.remove('hidden'); } }
+            function updateAdminUI() { if (isAdminLoggedIn) { loginBtn.classList.add('hidden'); logoutBtn.classList.remove('hidden'); if (!pages.misc.classList.contains('hidden')) { addPostBtn.classList.remove('hidden'); } } else { loginBtn.classList.remove('hidden'); logoutBtn.classList.add('hidden'); addPostBtn.classList.add('hidden'); } }
+            function handleLogin(event) { event.preventDefault(); const username = document.getElementById('username').value; const password = document.getElementById('password').value; if (username === 'Admin' && password === 'Admin') { isAdminLoggedIn = true; loginModal.classList.add('hidden'); loginForm.reset(); loginError.classList.add('hidden'); updateAdminUI(); } else { loginError.classList.remove('hidden'); } }
+            function handleLogout() { isAdminLoggedIn = false; updateAdminUI(); }
+            function handlePostSubmit(event) { event.preventDefault(); const postText = document.getElementById('post-text').value; const postImageUrl = document.getElementById('post-image').value; const postElement = document.createElement('div'); postElement.className = 'post'; const textElement = document.createElement('p'); textElement.className = 'text-gray-300'; textElement.textContent = postText; postElement.appendChild(textElement); if (postImageUrl) { const imgElement = document.createElement('img'); imgElement.src = postImageUrl; imgElement.onerror = () => { imgElement.alt = 'Image failed to load'; imgElement.src = `https://placehold.co/600x400/0d0221/2dd4bf?text=CORRUPT+DATA`; }; postElement.appendChild(imgElement); } miscContent.insertBefore(postElement, miscContent.firstChild); postModal.classList.add('hidden'); postForm.reset(); }
+            function toggleMute() { audio.muted = !audio.muted; if (audio.muted) { volumeOnIcon.classList.add('hidden'); volumeOffIcon.classList.remove('hidden'); } else { volumeOnIcon.classList.remove('hidden'); volumeOffIcon.classList.add('hidden'); } }
+
+            // --- Event Listeners ---
+            navButtons.home.addEventListener('click', () => { showPage('homepage'); updateAdminUI(); });
+            navButtons.projects.addEventListener('click', () => { showPage('projects'); updateAdminUI(); });
+            navButtons.misc.addEventListener('click', () => { showPage('misc'); updateAdminUI(); });
+            loginBtn.addEventListener('click', () => loginModal.classList.remove('hidden'));
+            logoutBtn.addEventListener('click', handleLogout);
+            cancelLoginBtn.addEventListener('click', () => { loginModal.classList.add('hidden'); loginError.classList.add('hidden'); loginForm.reset(); });
+            loginForm.addEventListener('submit', handleLogin);
+            addPostBtn.addEventListener('click', () => postModal.classList.remove('hidden'));
+            cancelPostBtn.addEventListener('click', () => { postModal.classList.add('hidden'); postForm.reset(); });
+            postForm.addEventListener('submit', handlePostSubmit);
+            muteBtn.addEventListener('click', toggleMute);
+
+            // --- Initial Setup ---
+            showPage('homepage');
+            updateAdminUI();
+            updateTime();
+            setInterval(updateTime, 1000); // Update time every second
+            fetchSystemInfo();
+            fetchNews();
+            audio.play().catch(() => { audio.muted = true; toggleMute(); });
+        });
+    </script>
 </body>
 </html>
