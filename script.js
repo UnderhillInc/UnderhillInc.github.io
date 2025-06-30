@@ -2,93 +2,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURATION ---
     const config = {
-        // List of RSS feeds for the main news column.
-        newsFeeds: [
-            { name: 'BBC News', url: 'http://feeds.bbci.co.uk/news/rss.xml' },
-            { name: 'Reuters UK', url: 'http://feeds.reuters.com/reuters/UKTopNews' },
-            { name: 'The Guardian', url: 'https://www.theguardian.com/uk/rss' },
-            { name: 'Ars Technica', url: 'http://feeds.arstechnica.com/arstechnica/index' },
-            { name: 'TVLine', url: 'https://tvline.com/feed/' }
-        ],
-        // Separate feed for the sidebar TV listings.
-        tvEpisodesFeed: { name: 'AniDB', url: 'https://anidb.net/rss/latest_episodes.xml' },
-        // Using a reliable RSS-to-JSON converter service to bypass CORS.
+        rssFeeds: {
+            news: [
+                { name: 'BBC News', url: 'http://feeds.bbci.co.uk/news/rss.xml' },
+                { name: 'Reuters UK', url: 'http://feeds.reuters.com/reuters/UKTopNews' },
+                { name: 'The Guardian', url: 'https://www.theguardian.com/uk/rss' },
+                { name: 'Ars Technica', url: 'http://feeds.arstechnica.com/arstechnica/index' },
+            ],
+            tv: { url: 'https://showrss.info/user/290448.rss?magnets=true&namespaces=false&name=clean&quality=null&re=null' },
+            weather: { url: 'https://www.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/ne' },
+            travelTours: { url: 'https://www.travelagentcentral.com/rss/tours/xml' },
+            travelHotels: { url: 'https://www.travelagentcentral.com/rss/hotels/xml' },
+        },
         rssToJsonService: 'https://api.rss2json.com/v1/api.json?rss_url=',
     };
 
-    // --- DOM ELEMENT SELECTORS ---
-    const elements = {
-        clock: document.getElementById('clock'),
-        footerText: document.getElementById('footer-text'),
-        musicControl: document.getElementById('music-control'),
-        audio: document.getElementById('background-music'),
-        newsColumn: document.getElementById('main-news-column'),
-        tvEpisodesList: document.getElementById('tv-episodes-list')
-    };
+    // --- PAGE ROUTER ---
+    // This function checks which page is currently loaded and calls the appropriate functions.
+    function pageRouter() {
+        updateClock(); // Universal for all pages
+        
+        if (document.getElementById('news-page')) {
+            updateNews();
+        }
+        if (document.getElementById('travel-page')) {
+            updateTravel();
+        }
+        if (document.getElementById('tv-page')) {
+            updateTvListings();
+        }
+        if (document.getElementById('weather-page')) {
+            updateWeather();
+        }
+        // The index and channels pages are static and don't require JS data loading.
+    }
 
-    /**
-     * Fetches and parses an RSS feed using an external service.
-     * @param {string} feedUrl - The URL of the RSS feed.
-     * @returns {Promise<object>} - The parsed JSON response from the service.
-     */
+    // --- RSS FETCHER ---
     async function fetchRss(feedUrl) {
         const encodedUrl = encodeURIComponent(feedUrl);
         const response = await fetch(`${config.rssToJsonService}${encodedUrl}`);
-        if (!response.ok) {
-            throw new Error(`RSS fetch failed: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`RSS fetch failed: ${response.status}`);
         return response.json();
     }
-    
-    /**
-     * Fetches news from all configured RSS feeds and renders them.
-     */
+
+    // --- PAGE-SPECIFIC UPDATE FUNCTIONS ---
+
     async function updateNews() {
+        const container = document.getElementById('main-news-column');
         try {
-            // Fetch all main news feeds concurrently.
-            const feedPromises = config.newsFeeds.map(feed => 
-                fetchRss(feed.url).catch(e => {
-                    console.error(`Failed to fetch ${feed.name}:`, e);
-                    return null; // Return null on failure to not break Promise.all
-                })
-            );
+            const feedPromises = config.rssFeeds.news.map(feed => fetchRss(feed.url).catch(e => null));
             const results = await Promise.all(feedPromises);
 
             let allArticles = [];
             results.forEach((result, index) => {
                 if (result && result.status === 'ok') {
                     result.items.forEach(item => {
-                        item.sourceName = config.newsFeeds[index].name;
+                        item.sourceName = config.rssFeeds.news[index].name;
                         allArticles.push(item);
                     });
                 }
             });
 
-            if (allArticles.length === 0) {
-                showError(elements.newsColumn, 'No headlines could be retrieved.');
-                return;
-            }
-
-            // Sort all articles by publication date, newest first.
+            if (allArticles.length === 0) throw new Error('No articles retrieved.');
+            
             allArticles.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+            container.innerHTML = '';
 
-            elements.newsColumn.innerHTML = ''; // Clear loading message
-
-            // Create and display the Lead Story.
+            // Render Lead Story
             const leadArticle = allArticles[0];
-            if (leadArticle) {
-                const leadStoryDiv = document.createElement('div');
-                leadStoryDiv.className = 'lead-story';
-                const cleanDescription = leadArticle.description.replace(/<[^>]*>?/gm, '');
-                leadStoryDiv.innerHTML = `
-                    <div class="lead-story-header">LEAD STORY - ${leadArticle.sourceName}</div>
-                    <div class="lead-story-title">${leadArticle.title}</div>
-                    <div class="lead-story-description">${cleanDescription.substring(0, 200)}... <a href="${leadArticle.link}" target="_blank" rel="noopener noreferrer">-&gt; more</a></div>
-                `;
-                elements.newsColumn.appendChild(leadStoryDiv);
-            }
+            const leadStoryDiv = document.createElement('div');
+            leadStoryDiv.className = 'lead-story';
+            const cleanDescription = leadArticle.description.replace(/<[^>]*>?/gm, '');
+            leadStoryDiv.innerHTML = `
+                <div class="lead-story-header">LEAD STORY - ${leadArticle.sourceName}</div>
+                <div class="lead-story-title">${leadArticle.title}</div>
+                <div class="lead-story-description">${cleanDescription.substring(0, 200)}... <a href="${leadArticle.link}" target="_blank" rel="noopener noreferrer">-&gt; more</a></div>`;
+            container.appendChild(leadStoryDiv);
 
-            // Group the rest of the articles by source.
+            // Group and render other articles
             const otherArticles = allArticles.slice(1);
             const articlesBySource = otherArticles.reduce((acc, article) => {
                 if (!acc[article.sourceName]) acc[article.sourceName] = [];
@@ -96,61 +87,105 @@ document.addEventListener('DOMContentLoaded', () => {
                 return acc;
             }, {});
 
-            // Create and append a section for each remaining news source.
             for (const [sourceName, articles] of Object.entries(articlesBySource)) {
                 const section = document.createElement('section');
                 section.className = 'news-outlet';
-                const h2 = document.createElement('h2');
-                h2.textContent = sourceName;
-                
+                section.innerHTML = `<h2>${sourceName}</h2>`;
                 const ul = document.createElement('ul');
-                articles.slice(0, 4).forEach((article, index) => {
+                articles.slice(0, 3).forEach((article, index) => {
                     const li = document.createElement('li');
-                    li.innerHTML = `
-                        <div class="headline-number">${index + 1}</div>
-                        <div class="headline-text">${article.title} <a href="${article.link}" target="_blank" rel="noopener noreferrer">-&gt;</a></div>`;
+                    li.innerHTML = `<div class="headline-number">${index + 1}</div><div class="headline-text">${article.title} <a href="${article.link}" target="_blank" rel="noopener noreferrer">-&gt;</a></div>`;
                     ul.appendChild(li);
                 });
-
-                section.appendChild(h2);
                 section.appendChild(ul);
-                elements.newsColumn.appendChild(section);
+                container.appendChild(section);
             }
-
         } catch (error) {
-            console.error("News processing failed:", error);
-            showError(elements.newsColumn, 'NEWS FEED UNAVAILABLE. CHECK CONSOLE.');
+            showError(container, 'NEWS FEED UNAVAILABLE.');
+            console.error("News update failed:", error);
         }
     }
 
-    /**
-     * Fetches and displays the latest TV episodes in the sidebar.
-     */
-    async function updateTvEpisodes() {
-        showLoading(elements.tvEpisodesList);
+    async function updateTravel() {
+        const toursList = document.getElementById('travel-list-tours');
+        const hotelsList = document.getElementById('travel-list-hotels');
+        showLoading(toursList);
+        showLoading(hotelsList);
+
         try {
-            const data = await fetchRss(config.tvEpisodesFeed.url);
+            const toursData = await fetchRss(config.rssFeeds.travelTours.url);
+            toursList.innerHTML = '';
+            if (toursData.status === 'ok') {
+                toursData.items.slice(0, 4).forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `${item.title.substring(0, 50)}... <span>-&gt;</span>`;
+                    toursList.appendChild(li);
+                });
+            } else {
+                showError(toursList, 'Tour feed unavailable.');
+            }
+        } catch (e) {
+            showError(toursList, 'Tour feed error.');
+        }
+
+        try {
+            const hotelsData = await fetchRss(config.rssFeeds.travelHotels.url);
+            hotelsList.innerHTML = '';
+            if (hotelsData.status === 'ok') {
+                hotelsData.items.slice(0, 4).forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `${item.title.substring(0, 50)}... <span>-&gt;</span>`;
+                    hotelsList.appendChild(li);
+                });
+            } else {
+                showError(hotelsList, 'Hotel feed unavailable.');
+            }
+        } catch (e) {
+            showError(hotelsList, 'Hotel feed error.');
+        }
+    }
+
+    async function updateTvListings() {
+        const container = document.getElementById('tv-listings-container');
+        try {
+            const data = await fetchRss(config.rssFeeds.tv.url);
+            if (data.status !== 'ok' || data.items.length === 0) throw new Error('TV feed unavailable.');
+            
+            container.innerHTML = '';
+            data.items.slice(0, 10).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'tv-listing';
+                div.innerHTML = `<div class="tv-listing-title">${item.title}</div>`;
+                container.appendChild(div);
+            });
+        } catch (error) {
+            showError(container, 'TV LISTINGS UNAVAILABLE.');
+            console.error("TV update failed:", error);
+        }
+    }
+
+    async function updateWeather() {
+        const container = document.getElementById('weather-warnings-container');
+        try {
+            const data = await fetchRss(config.rssFeeds.weather.url);
             if (data.status !== 'ok' || data.items.length === 0) {
-                showError(elements.tvEpisodesList, 'Feed unavailable.');
+                container.innerHTML = '<div class="weather-warning"><div class="weather-warning-title">No warnings in effect for North East England.</div></div>';
                 return;
             }
 
-            elements.tvEpisodesList.innerHTML = ''; // Clear loading
-            data.items.slice(0, 6).forEach(item => { // Show top 6
-                const li = document.createElement('li');
-                // Title format from AniDB is often "[Show] - [Episode Number]"
-                // We'll try to split it for better formatting.
-                const parts = item.title.split(' - ');
-                const showName = parts[0];
-                const episodeInfo = parts.length > 1 ? parts[1] : '';
-
-                li.innerHTML = `<span class="episode-title">${showName}</span><br>- Ep ${episodeInfo}`;
-                elements.tvEpisodesList.appendChild(li);
+            container.innerHTML = '';
+            data.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'weather-warning';
+                const cleanDescription = item.description.replace(/<[^>]*>?/gm, '');
+                div.innerHTML = `
+                    <div class="weather-warning-title">${item.title}</div>
+                    <div class="weather-warning-description">${cleanDescription}</div>`;
+                container.appendChild(div);
             });
-
         } catch (error) {
-            console.error("TV Episodes fetch failed:", error);
-            showError(elements.tvEpisodesList, 'EPISODE DATA UNAVAILABLE');
+            showError(container, 'WEATHER WARNINGS UNAVAILABLE.');
+            console.error("Weather update failed:", error);
         }
     }
 
@@ -162,39 +197,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showError(element, message) {
         if (!element) return;
-        element.innerHTML = `<li class="error-message">${message}</li>`;
+        element.innerHTML = `<div class="error-message">${message}</div>`;
     }
 
     function updateClock() {
-        elements.clock.textContent = new Date().toLocaleTimeString('en-GB');
+        const clockElement = document.getElementById('clock');
+        if (clockElement) {
+            setInterval(() => {
+                clockElement.textContent = new Date().toLocaleTimeString('en-GB');
+            }, 1000);
+        }
     }
 
     // --- INITIALIZATION ---
     function init() {
-        updateClock();
-        setInterval(updateClock, 1000);
+        pageRouter(); // Run the correct functions for the current page
+        
+        const footer = document.querySelector('.page-footer');
+        if (footer) {
+             footer.insertAdjacentHTML('beforeend', '<button id="music-control">MUSIC OFF</button>');
+             const musicControl = document.getElementById('music-control');
+             const audio = document.createElement('audio');
+             audio.id = 'background-music';
+             audio.loop = true;
+             document.body.appendChild(audio);
 
-        elements.musicControl.addEventListener('click', () => {
-             if(elements.audio.src.includes('#')) {
-                alert("To enable music, please edit the HTML and replace the '#' in the <audio> tag's src attribute with a direct link to an audio file (.mp3, .ogg, etc.).");
-                return;
-            }
-            const isPlaying = elements.audio.paused;
-            if (isPlaying) elements.audio.play().catch(e => console.error("Audio play failed", e));
-            else elements.audio.pause();
-            elements.musicControl.textContent = isPlaying ? 'MUSIC ON' : 'MUSIC OFF';
-        });
-
-        // Fetch all data ONCE on page load.
-        elements.footerText.textContent = "STATUS: FETCHING LATEST DATA...";
-        Promise.allSettled([
-            updateNews(),
-            updateTvEpisodes()
-        ]).then(() => {
-             elements.footerText.textContent = "STATUS: ONLINE. Last update: " + new Date().toLocaleTimeString('en-GB');
-        });
+             musicControl.addEventListener('click', () => {
+                 if(!audio.src) audio.src = "https://www.myinstants.com/media/sounds/ceefax-pages-from-history-opening-titles-1983.mp3";
+                 const isPlaying = audio.paused;
+                 if (isPlaying) audio.play().catch(e => console.error("Audio play failed", e));
+                 else audio.pause();
+                 musicControl.textContent = isPlaying ? 'MUSIC ON' : 'MUSIC OFF';
+             });
+        }
     }
 
-    // Start the application
     init();
 });

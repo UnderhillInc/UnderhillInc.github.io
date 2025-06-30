@@ -3,80 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Daily Teletext</title>
-    <!-- Google Fonts for retro 'VT323' and blocky 'Press Start 2P' -->
+    <title>The Daily Teletext - P100</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <!-- Link to the external CSS file -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Main container for the entire teletext screen -->
-    <div class="teletext-container">
-        <!-- Overlay to simulate CRT scanlines -->
+    <div id="home-page" class="teletext-container">
         <div class="scanline-overlay"></div>
-
-        <!-- Header section with the main title and clock -->
         <header class="masthead">
             <h1>The Daily Teletext</h1>
             <div class="sub-header">
-                <span id="news-source">RSS Feed</span>
+                <span>P100 CEEFAX 1</span>
                 <span id="clock">--:--:--</span>
             </div>
         </header>
 
-        <!-- Top banner advertisement -->
-        <div class="ad-banner-top">
-            Teletext: The Future of News... Yesterday! -- <span class="blinking">ALWAYS ON</span>
-        </div>
-
-        <!-- Main content area, split into a main column and a sidebar -->
-        <main class="main-content">
-            <!-- Main column for news articles -->
-            <div class="main-news-column" id="main-news-column">
-                <!-- Lead Story and other news outlets will be dynamically inserted here by script.js -->
-                 <div class="loading-message">Fetching headlines... <span class="blinking-cursor">_</span></div>
-            </div>
-            
-            <!-- The right-hand sidebar with static placeholder content -->
-            <aside class="sidebar">
-                <section class="info-box" id="weather">
-                    <h2><span>Weather</span> <span class="offline-tag">OFFLINE</span></h2>
-                    <div class="weather-art-box">
-                        <div class="static-weather-icon">?</div>
-                    </div>
-                    <div id="weather-content" class="weather-info">
-                        <strong>Weather Service</strong><br>
-                        Data feed currently unavailable. Please check back later.
-                    </div>
-                </section>
-                <section class="info-box" id="tv-episodes">
-                    <h2><span>Latest Episodes</span> <span>p.801</span></h2>
-                    <ul id="tv-episodes-list" class="tv-episodes-info">
-                        <!-- TV Listings will be populated here -->
-                    </ul>
-                </section>
-                <div class="ad-box-sidebar">
-                    <h3>TELETEXT HOLIDAYS</h3>
-                    <p>7 NIGHTS IN THE SUN</p>
-                    <p class="price">ONLY £249!</p>
-                    <p>SEE PAGE 357 FOR MORE</p>
+        <main class="main-content-grid">
+            <div class="index-left-col">
+                <div class="index-list">
+                    <a href="news.html"><span>NEWS HEADLINES</span> <span class="page-num">101</span></a>
+                    <a href="weather.html"><span>WEATHER</span> <span class="page-num">200</span></a>
+                    <a href="travel.html"><span>HOLIDAYS</span> <span class="page-num">400</span></a>
+                    <a href="tv.html"><span>TV LISTINGS</span> <span class="page-num">600</span></a>
                 </div>
-            </aside>
+                 <div class="ad-box-large">
+                    <h2><span class="yellow">BAMBU-ROD!</span></h2>
+                    <p class="cyan">THE FUTURE OF FISHING!</p>
+                    <p class="white">LIGHTWEIGHT, STRONG, AND GUARANTEED TO CATCH MORE*</p>
+                    <p class="yellow">CALL 0800-FISH-NOW!</p>
+                    <p class="white" style="font-size: 0.7em;">*Guarantee not legally binding.</p>
+                </div>
+            </div>
+            <div class="index-right-col">
+                <div class="ad-box-small yellow-bg blue-text">
+                    <p>MicroWorld PCs</p>
+                    <p>A 486DX2 for only</p>
+                    <p class="price-large">£999!</p>
+                    <p>SEE PAGE 512</p>
+                </div>
+                <div class="index-list">
+                    <a href="channels.html"><span>CHANNELS A-Z</span> <span class="page-num">999</span></a>
+                </div>
+                <div class="ad-box-small red-bg yellow-text">
+                    <p>TELETEXT CARS</p>
+                    <p>FIND YOUR NEXT MOTOR!</p>
+                    <p>UPDATED HOURLY</p>
+                    <p>PAGE 401</p>
+                </div>
+            </div>
         </main>
         
-        <!-- Footer section -->
         <footer class="page-footer">
-             <div id="footer-text">STATUS: CONNECTING...</div>
-             <button id="music-control">MUSIC OFF</button>
+             <a href="news.html">News</a>
+             <a href="weather.html">Weather</a>
+             <a href="travel.html">Travel</a>
+             <a href="tv.html">TV</a>
+             <a href="channels.html">A-Z</a>
         </footer>
     </div>
-    
-    <!-- Audio element for background music -->
-    <audio id="background-music" src="#" loop></audio>
-    
-    <!-- Link to the external JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>
