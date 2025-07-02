@@ -3,71 +3,856 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Daily Teletext - P100</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Side-Scrolling Shooter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Hide scrollbars */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            background-color: #1a1a2e; /* Dark background */
+            color: #e0e0e0;
+            font-family: 'Press Start 2P', cursive; /* Pixel font */
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #00f0ff; /* Bright blue title */
+            margin-bottom: 20px;
+            font-size: 2em;
+            text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+        }
+
+        #game-container {
+            position: relative;
+            background-color: #0d0d1a; /* Even darker game background */
+            border: 4px solid #00f0ff; /* Border matching title */
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            max-width: 98vw; /* Max width for responsiveness */
+            max-height: 95vh; /* Max height for responsiveness */
+            box-sizing: border-box;
+        }
+
+        canvas {
+            background-color: #05050a; /* Deepest background for canvas */
+            display: block;
+            border-radius: 10px;
+            touch-action: none; /* Prevent default touch actions like scrolling/zooming */
+        }
+
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 20px;
+            font-size: 0.9em;
+            color: #e0e0e0;
+        }
+
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ff0077; /* Game over color */
+            font-size: 2em;
+            text-shadow: 0 0 10px #ff0077;
+            z-index: 100;
+            border-radius: 10px;
+            display: none; /* Hidden by default */
+        }
+
+        #game-over-screen button {
+            background-color: #00f0ff;
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 30px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 240, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        #game-over-screen button:hover {
+            background-color: #00b0c0;
+            box-shadow: 0 8px 20px rgba(0, 240, 255, 0.8);
+            transform: translateY(-3px);
+        }
+
+        #controls {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #a0a0a0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            #game-info {
+                font-size: 0.8em;
+                padding: 5px 10px;
+            }
+            #game-over-screen {
+                font-size: 1.5em;
+            }
+            #game-over-screen button {
+                padding: 10px 20px;
+                font-size: 0.8em;
+            }
+            #controls {
+                font-size: 0.7em;
+            }
+        }
+
+        /* Touch controls for mobile */
+        #touch-controls {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+            padding: 0 10px;
+            box-sizing: border-box;
+            flex-wrap: wrap; /* Allow buttons to wrap */
+        }
+
+        .touch-button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 0 4px #999;
+            transition: all 0.2s ease;
+            flex: 1; /* Distribute space evenly */
+            max-width: 120px; /* Limit button size */
+            min-width: 80px; /* Ensure buttons aren't too small */
+        }
+
+        .touch-button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 2px #666;
+            transform: translateY(2px);
+        }
+
+        #fire-button {
+            background-color: #f44336; /* Red */
+        }
+        #fire-button:active {
+            background-color: #da190b;
+        }
+
+        #reload-button {
+            background-color: #2196F3; /* Blue */
+        }
+        #reload-button:active {
+            background-color: #0b7dda;
+        }
+
+        /* Hide touch controls on desktop */
+        @media (min-width: 769px) {
+            #touch-controls {
+                display: none;
+            }
+        }
+
+        /* Show touch controls on mobile */
+        @media (max-width: 768px) {
+            #touch-controls {
+                display: flex;
+            }
+        }
+
+    </style>
 </head>
 <body>
-    <div id="home-page" class="teletext-container">
-        <div class="scanline-overlay"></div>
-        <header class="masthead">
-            <h1>The Daily Teletext</h1>
-            <div class="sub-header">
-                <span>P100 CEEFAX 1</span>
-                <span id="clock">--:--:--</span>
-            </div>
-        </header>
-
-        <main class="main-content-grid">
-            <div class="index-left-col">
-                <div class="index-list">
-                    <a href="news.html"><span>NEWS HEADLINES</span> <span class="page-num">101</span></a>
-                    <a href="weather.html"><span>WEATHER</span> <span class="page-num">200</span></a>
-                    <a href="#"><span>SPORT</span> <span class="page-num">300</span></a>
-                    <a href="travel.html"><span>HOLIDAYS</span> <span class="page-num">400</span></a>
-                    <a href="#"><span>FINANCE</span> <span class="page-num">500</span></a>
-                    <a href="tv.html"><span>TV LISTINGS</span> <span class="page-num">600</span></a>
-                </div>
-                 <div class="ad-box-large">
-                    <h2><span class="yellow">BAMBU-ROD!</span></h2>
-                    <p class="cyan">THE FUTURE OF FISHING!</p>
-                    <p class="white">LIGHTWEIGHT, STRONG, AND GUARANTEED TO CATCH MORE*</p>
-                    <p class="yellow">CALL 0800-FISH-NOW!</p>
-                    <p class="white" style="font-size: 0.7em;">*Guarantee not legally binding.</p>
-                </div>
-            </div>
-            <div class="index-right-col">
-                <div class="ad-box-small yellow-bg blue-text">
-                    <p>MicroWorld PCs</p>
-                    <p>A 486DX2 for only</p>
-                    <p class="price-large">£999!</p>
-                    <p>SEE PAGE 512</p>
-                </div>
-                <div class="index-list">
-                    <a href="#"><span>LOTTERY RESULTS</span> <span class="page-num">123</span></a>
-                    <a href="#"><span>REGIONAL NEWS</span> <span class="page-num">160</span></a>
-                    <a href="#"><span>CLASSIFIED ADS</span> <span class="page-num">370</span></a>
-                    <a href="channels.html"><span>CHANNELS A-Z</span> <span class="page-num">999</span></a>
-                </div>
-                <div class="ad-box-small red-bg yellow-text">
-                    <p>YOUR HOROSCOPE</p>
-                    <p>What do the stars have in store for you today?</p>
-                    <p>PAGE 430-442</p>
-                </div>
-            </div>
-        </main>
-        
-        <footer class="page-footer">
-             <a href="index.html">Main Menu 100</a>
-             <a href="news.html">News</a>
-             <a href="weather.html">Weather</a>
-             <a href="travel.html">Travel</a>
-             <a href="tv.html">TV</a>
-             <a href="channels.html">A-Z</a>
-        </footer>
+    <h1>Side-Scrolling Shooter</h1>
+    <div id="game-container">
+        <div id="game-info">
+            <span id="score-display">SCORE: 0</span>
+            <span id="health-display">HEALTH: 100</span>
+            <span id="ammo-display">AMMO: 8/8</span>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div id="game-over-screen">
+            <h2>GAME OVER!</h2>
+            <p>Your Score: <span id="final-score">0</span></p>
+            <button id="restart-button">RESTART GAME</button>
+        </div>
     </div>
-    <script src="script.js"></script>
+    <div id="controls">
+        <p>Use <strong>Arrow Keys</strong> to move. <strong>Click Mouse</strong> to shoot. Press <strong>R</strong> to reload.</p>
+    </div>
+    <div id="touch-controls">
+        <button class="touch-button" id="up-button">▲</button>
+        <button class="touch-button" id="left-button">◀</button>
+        <button class="touch-button" id="right-button">▶</button>
+        <button class="touch-button" id="down-button">▼</button>
+        <button class="touch-button" id="fire-button">FIRE</button>
+        <button class="touch-button" id="reload-button">RELOAD</button>
+    </div>
+
+    <script>
+        // Get the canvas and its 2D rendering context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Get game info and game over screen elements
+        const scoreDisplay = document.getElementById('score-display');
+        const healthDisplay = document.getElementById('health-display');
+        const ammoDisplay = document.getElementById('ammo-display');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart-button');
+
+        // Game state variables
+        let gameRunning = false;
+        let score = 0;
+        let health = 100;
+        let animationFrameId; // To store the requestAnimationFrame ID for cancellation
+
+        // Image assets
+        const backgroundImage = new Image();
+        backgroundImage.src = 'background.png';
+        const roadImage = new Image();
+        roadImage.src = 'road.png.jpg';
+        const enblobImage = new Image();
+        enblobImage.src = 'enblob.png';
+        const gunImage = new Image();
+        gunImage.src = 'gun.png';
+
+        let imagesLoaded = 0;
+        const totalImages = 4; // Update this if you add/remove images
+
+        function imageLoaded() {
+            imagesLoaded++;
+            if (imagesLoaded === totalImages) {
+                console.log("All images loaded.");
+                initializeGame();
+            }
+        }
+
+        backgroundImage.onload = imageLoaded;
+        roadImage.onload = imageLoaded;
+        enblobImage.onload = imageLoaded;
+        gunImage.onload = imageLoaded;
+
+        // Fallback for image loading errors
+        backgroundImage.onerror = () => { console.error("Failed to load background.png"); imageLoaded(); };
+        roadImage.onerror = () => { console.error("Failed to load road.png.jpg"); imageLoaded(); };
+        enblobImage.onerror = () => { console.error("Failed to load enblob.png"); imageLoaded(); };
+        gunImage.onerror = () => { console.error("Failed to load gun.png"); imageLoaded(); };
+
+
+        // Player properties (now a person)
+        const player = {
+            x: 50,
+            y: 0, // Will be set to floor position
+            width: 30, // Body width
+            height: 45, // Body height
+            speed: 5,
+            color: '#00ff00', // Green (for drawing if image fails)
+            velocityY: 0,
+            onGround: false,
+            jumpStrength: 10
+        };
+
+        // Player weapon properties
+        const gun = {
+            width: 40, // Width of the gun image
+            height: 20, // Height of the gun image
+            offsetX: 10, // Offset from player center to draw gun
+            offsetY: 0,
+            angle: 0 // Current rotation angle of the gun
+        };
+
+        // Mouse position for aiming
+        let mouseX = 0;
+        let mouseY = 0;
+
+        // Game physics constants
+        const gravity = 0.5; // pixels/frame^2
+        let floorHeight = 20; // Height of the floor from the bottom of the canvas
+
+        // Background scrolling
+        let backgroundX = 0;
+        const backgroundScrollSpeed = 0.5; // Speed at which the background scrolls left
+
+        // Keyboard input state
+        const keys = {
+            ArrowUp: false,
+            ArrowDown: false,
+            ArrowLeft: false,
+            ArrowRight: false,
+            KeyR: false // Key for reload
+        };
+
+        // Bullet properties
+        const bullets = [];
+        const bulletSpeed = 15; // Increased bullet speed
+        const bulletRadius = 5; // For circular bullets
+        const bulletColor = '#ffff00'; // Yellow
+        let lastShotTime = 0;
+        const shotCooldown = 200; // milliseconds
+
+        // Ammo properties
+        const maxAmmo = 8; // Changed max ammo
+        let currentAmmo = maxAmmo;
+        let isReloading = false;
+        const reloadTime = 1500; // milliseconds (1.5 seconds)
+
+        // Enemy properties
+        const enemies = [];
+        const enemySpeed = 2;
+        const enemyWidth = 40; // Adjusted for enblob.png
+        const enemyHeight = 40; // Adjusted for enblob.png
+        const enemyColor = '#ff0000'; // Red (for drawing if image fails)
+        let lastEnemySpawnTime = 0;
+        const enemySpawnInterval = 1500; // milliseconds
+
+        // Function to set canvas dimensions based on container and aspect ratio
+        function setCanvasDimensions() {
+            const minWidth = 860; // Minimum width as requested
+            const minHeight = 540; // Minimum height as requested
+
+            const container = document.getElementById('game-container');
+            const containerWidth = container.clientWidth - 20; // Account for padding
+            const containerHeight = container.clientHeight - 80; // Account for info bar and some padding
+
+            let newWidth = Math.max(minWidth, containerWidth);
+            let newHeight = Math.max(minHeight, containerHeight);
+
+            // Prioritize minimum dimensions, then scale to fit container while maintaining aspect ratio
+            const aspectRatio = minWidth / minHeight;
+
+            if (newWidth / aspectRatio > containerHeight) {
+                newHeight = containerHeight;
+                newWidth = newHeight * aspectRatio;
+            }
+            if (newHeight * aspectRatio > containerWidth) { // Check if width would exceed container
+                newWidth = containerWidth;
+                newHeight = newWidth / aspectRatio;
+            }
+
+            canvas.width = Math.floor(newWidth);
+            canvas.height = Math.floor(newHeight);
+
+            // Adjust player initial position to be on the floor
+            player.y = canvas.height - player.height - floorHeight;
+            player.onGround = true; // Player starts on the ground
+        }
+
+        // --- Game Initialization and Reset ---
+        function initializeGame() {
+            setCanvasDimensions(); // Set initial canvas size
+            window.addEventListener('resize', setCanvasDimensions); // Adjust on resize
+
+            score = 0;
+            health = 100;
+            currentAmmo = maxAmmo; // Reset ammo
+            isReloading = false;
+            player.x = 50;
+            player.y = canvas.height - player.height - floorHeight; // Recalculate player Y
+            player.velocityY = 0;
+            player.onGround = true;
+            bullets.length = 0; // Clear bullets array
+            enemies.length = 0; // Clear enemies array
+            lastShotTime = 0;
+            lastEnemySpawnTime = 0;
+            backgroundX = 0; // Reset background position
+
+            updateScoreDisplay();
+            updateHealthDisplay();
+            updateAmmoDisplay(); // Update ammo display
+            gameOverScreen.style.display = 'none';
+            gameRunning = true;
+
+            // Start the game loop
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId); // Cancel any existing loop
+            }
+            gameLoop();
+        }
+
+        // --- Input Handling ---
+        document.addEventListener('keydown', (e) => {
+            if (e.code in keys) {
+                keys[e.code] = true;
+                e.preventDefault(); // Prevent default browser actions (e.g., scrolling)
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.code in keys) {
+                keys[e.code] = false;
+            }
+        });
+
+        // Mouse movement for aiming
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        // Mouse click for shooting
+        canvas.addEventListener('click', (e) => {
+            if (!gameRunning) return; // Only allow shooting if game is running
+
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Player center for bullet origin
+            const playerCenterX = player.x + player.width / 2;
+            const playerCenterY = player.y + player.height / 2;
+
+            if ((performance.now() - lastShotTime > shotCooldown) && currentAmmo > 0 && !isReloading) {
+                // Calculate direction vector from player to click
+                const dx = clickX - playerCenterX;
+                const dy = clickY - playerCenterY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // Normalize and scale by bullet speed
+                const bulletDx = (dx / distance) * bulletSpeed;
+                const bulletDy = (dy / distance) * bulletSpeed;
+
+                bullets.push({
+                    x: playerCenterX, // Start from player center
+                    y: playerCenterY,
+                    radius: bulletRadius,
+                    color: bulletColor,
+                    dx: bulletDx,
+                    dy: bulletDy
+                });
+                lastShotTime = performance.now();
+                currentAmmo--; // Consume ammo
+                updateAmmoDisplay();
+            }
+        });
+
+
+        // Touch controls
+        const touchButtons = {
+            'up-button': 'ArrowUp',
+            'down-button': 'ArrowDown',
+            'left-button': 'ArrowLeft',
+            'right-button': 'ArrowRight',
+            'reload-button': 'KeyR' // New reload button
+        };
+
+        for (const [id, keyName] of Object.entries(touchButtons)) {
+            const button = document.getElementById(id);
+            if (button) {
+                button.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevent long press context menu etc.
+                    keys[keyName] = true;
+                }, { passive: false }); // Use passive: false for preventDefault
+                button.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    keys[keyName] = false;
+                });
+            }
+        }
+
+        // Touch fire button
+        const fireButton = document.getElementById('fire-button');
+        if (fireButton) {
+            fireButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!gameRunning) return;
+
+                // Player center for bullet origin
+                const playerCenterX = player.x + player.width / 2;
+                const playerCenterY = player.y + player.height / 2;
+
+                // For touch fire, we'll just fire straight ahead or towards a default point for simplicity
+                // Or, if multi-touch, we could use a second touch for aiming.
+                // For now, let's just fire horizontally to the right.
+                const dx = 1; // Fire right
+                const dy = 0; // No vertical component
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                const bulletDx = (dx / distance) * bulletSpeed;
+                const bulletDy = (dy / distance) * bulletSpeed;
+
+                if ((performance.now() - lastShotTime > shotCooldown) && currentAmmo > 0 && !isReloading) {
+                    bullets.push({
+                        x: playerCenterX,
+                        y: playerCenterY,
+                        radius: bulletRadius,
+                        color: bulletColor,
+                        dx: bulletDx,
+                        dy: bulletDy
+                    });
+                    lastShotTime = performance.now();
+                    currentAmmo--;
+                    updateAmmoDisplay();
+                }
+            }, { passive: false });
+        }
+
+
+        // --- Game Logic Functions ---
+
+        // Update player position based on input and gravity
+        function updatePlayer() {
+            // Horizontal movement
+            if (keys.ArrowLeft) player.x -= player.speed;
+            if (keys.ArrowRight) player.x += player.speed;
+
+            // Jumping (only if on ground)
+            if (keys.ArrowUp && player.onGround) {
+                player.velocityY = -player.jumpStrength;
+                player.onGround = false;
+            }
+
+            // Apply gravity
+            player.velocityY += gravity;
+            player.y += player.velocityY;
+
+            // Check for floor collision
+            const floorY = canvas.height - player.height - floorHeight;
+            if (player.y >= floorY) {
+                player.y = floorY;
+                player.velocityY = 0;
+                player.onGround = true;
+            }
+
+            // Keep player within canvas horizontal boundaries
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            // Reload if 'R' is pressed and not already reloading and ammo is not full
+            if (keys.KeyR && !isReloading && currentAmmo < maxAmmo) {
+                isReloading = true;
+                ammoDisplay.textContent = `RELOADING...`; // Indicate reloading
+                setTimeout(() => {
+                    currentAmmo = maxAmmo;
+                    isReloading = false;
+                    updateAmmoDisplay();
+                }, reloadTime);
+            }
+
+            // Update gun angle to follow mouse
+            const playerCenterX = player.x + player.width / 2;
+            const playerCenterY = player.y + player.height / 2;
+            gun.angle = Math.atan2(mouseY - playerCenterY, mouseX - playerCenterX);
+        }
+
+        // Update bullet positions
+        function updateBullets() {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].x += bullets[i].dx;
+                bullets[i].y += bullets[i].dy;
+                // Remove bullets that go off-screen
+                if (bullets[i].x - bullets[i].radius > canvas.width ||
+                    bullets[i].x + bullets[i].radius < 0 ||
+                    bullets[i].y - bullets[i].radius > canvas.height ||
+                    bullets[i].y + bullets[i].radius < 0) {
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+
+        // Spawn new enemies
+        function spawnEnemies() {
+            if (performance.now() - lastEnemySpawnTime > enemySpawnInterval) {
+                // Spawn enemies at random Y positions above the floor
+                const spawnY = Math.random() * (canvas.height - floorHeight - enemyHeight);
+                enemies.push({
+                    x: canvas.width, // Start at the right edge
+                    y: spawnY,
+                    width: enemyWidth,
+                    height: enemyHeight,
+                    color: enemyColor // Fallback color
+                });
+                lastEnemySpawnTime = performance.now();
+            }
+        }
+
+        // Update enemy positions
+        function updateEnemies() {
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                enemies[i].x -= enemySpeed;
+                // Remove enemies that go off-screen
+                if (enemies[i].x + enemies[i].width < 0) {
+                    enemies.splice(i, 1);
+                }
+            }
+        }
+
+        // Simple AABB (Axis-Aligned Bounding Box) collision detection for rectangles
+        function checkRectCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        // Collision detection for circle (bullet) and rectangle (enemy)
+        function checkCircleRectCollision(circle, rect) {
+            // Find the closest point on the rectangle to the center of the circle
+            let testX = circle.x;
+            let testY = circle.y;
+
+            if (circle.x < rect.x) {
+                testX = rect.x;
+            } else if (circle.x > rect.x + rect.width) {
+                testX = rect.x + rect.width;
+            }
+
+            if (circle.y < rect.y) {
+                testY = rect.y;
+            } else if (circle.y > rect.y + rect.height) {
+                testY = rect.y + rect.height;
+            }
+
+            // Calculate the distance between the closest point and the circle's center
+            let distX = circle.x - testX;
+            let distY = circle.y - testY;
+            let distance = Math.sqrt((distX * distX) + (distY * distY));
+
+            // Check if the distance is less than the circle's radius
+            return distance <= circle.radius;
+        }
+
+
+        // Handle collisions between bullets and enemies, and player and enemies
+        function handleCollisions() {
+            // Bullet-Enemy collisions
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    // Treat enemy as a rectangle for collision with circular bullet
+                    if (checkCircleRectCollision(bullets[i], enemies[j])) {
+                        bullets.splice(i, 1);
+                        enemies.splice(j, 1);
+                        score += 10;
+                        updateScoreDisplay();
+                        break; // Bullet is removed, so move to next bullet
+                    }
+                }
+            }
+
+            // Player-Enemy collisions
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                // Player's main body for collision
+                const playerBody = {
+                    x: player.x,
+                    y: player.y,
+                    width: player.width,
+                    height: player.height
+                };
+                if (checkRectCollision(playerBody, enemies[i])) {
+                    enemies.splice(i, 1);
+                    health -= 20; // Player takes damage
+                    updateHealthDisplay();
+                    if (health <= 0) {
+                        endGame();
+                    }
+                }
+            }
+        }
+
+        // --- Drawing Functions ---
+
+        // Clear the canvas
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Draw the scrolling background
+        function drawBackground() {
+            if (!backgroundImage.complete || backgroundImage.naturalWidth === 0) {
+                // Fallback if image not loaded
+                ctx.fillStyle = '#05050a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                return;
+            }
+
+            // Draw two copies of the background to ensure seamless looping
+            // First copy
+            ctx.drawImage(backgroundImage, backgroundX, 0, canvas.width, canvas.height - floorHeight);
+            // Second copy, positioned to the right of the first
+            ctx.drawImage(backgroundImage, backgroundX + canvas.width, 0, canvas.width, canvas.height - floorHeight);
+
+            // Update background position for scrolling
+            backgroundX -= backgroundScrollSpeed;
+
+            // Loop the background when it goes off-screen
+            if (backgroundX <= -canvas.width) {
+                backgroundX = 0;
+            }
+        }
+
+        // Draw the static floor (road image)
+        function drawFloor() {
+            if (!roadImage.complete || roadImage.naturalWidth === 0) {
+                // Fallback if image not loaded
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(0, canvas.height - floorHeight, canvas.width, floorHeight);
+                return;
+            }
+            // Draw the road image to fill the floor area
+            ctx.drawImage(roadImage, 0, canvas.height - floorHeight, canvas.width, floorHeight);
+        }
+
+        // Draw the player (person model)
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+
+            // Body
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // Head (smaller rectangle on top of body)
+            const headWidth = player.width * 0.7;
+            const headHeight = player.height * 0.5;
+            const headX = player.x + (player.width - headWidth) / 2;
+            const headY = player.y - headHeight + 5; // Adjust Y to sit slightly above body
+            ctx.fillRect(headX, headY, headWidth, headHeight);
+
+            // Eyes (simple dots)
+            ctx.fillStyle = '#000000'; // Black eyes
+            ctx.fillRect(headX + headWidth * 0.2, headY + headHeight * 0.3, 3, 3);
+            ctx.fillRect(headX + headWidth * 0.8 - 3, headY + headHeight * 0.3, 3, 3);
+
+            // Draw gun
+            if (gunImage.complete && gunImage.naturalWidth > 0) {
+                ctx.save(); // Save the current canvas state
+
+                // Translate to the player's center (pivot point for rotation)
+                const playerCenterX = player.x + player.width / 2;
+                const playerCenterY = player.y + player.height / 2;
+                ctx.translate(playerCenterX, playerCenterY);
+
+                // Rotate by the calculated angle
+                ctx.rotate(gun.angle);
+
+                // Draw the gun image, offset so its center aligns with the player's center
+                // Adjust offsets based on gun image size and desired position relative to player
+                ctx.drawImage(gunImage, gun.offsetX, gun.offsetY - gun.height / 2, gun.width, gun.height);
+
+                ctx.restore(); // Restore the canvas state
+            }
+        }
+
+        // Draw all active bullets (circular)
+        function drawBullets() {
+            ctx.fillStyle = bulletColor;
+            bullets.forEach(bullet => {
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // Draw all active enemies (enblob image)
+        function drawEnemies() {
+            enemies.forEach(enemy => {
+                if (enblobImage.complete && enblobImage.naturalWidth > 0) {
+                    ctx.drawImage(enblobImage, enemy.x, enemy.y, enemy.width, enemy.height);
+                } else {
+                    // Fallback to drawing a rectangle if image not loaded
+                    ctx.fillStyle = enemy.color;
+                    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+                }
+            });
+        }
+
+        // Update score display
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `SCORE: ${score}`;
+        }
+
+        // Update health display
+        function updateHealthDisplay() {
+            healthDisplay.textContent = `HEALTH: ${health}`;
+            // Change color based on health for visual feedback
+            if (health > 70) {
+                healthDisplay.style.color = '#00ff00'; // Green
+            } else if (health > 30) {
+                healthDisplay.style.color = '#ffff00'; // Yellow
+            } else {
+                healthDisplay.style.color = '#ff0000'; // Red
+            }
+        }
+
+        // Update ammo display
+        function updateAmmoDisplay() {
+            if (isReloading) {
+                ammoDisplay.textContent = `RELOADING...`;
+                ammoDisplay.style.color = '#2196F3'; // Blue for reloading
+            } else {
+                ammoDisplay.textContent = `AMMO: ${currentAmmo}/${maxAmmo}`;
+                ammoDisplay.style.color = currentAmmo === 0 ? '#ff0000' : '#e0e0e0'; // Red if empty, else default
+            }
+        }
+
+        // --- Game Loop ---
+        function gameLoop() {
+            if (!gameRunning) return; // Stop the loop if game is not running
+
+            // Update game elements
+            updatePlayer();
+            updateBullets();
+            spawnEnemies();
+            updateEnemies();
+            handleCollisions();
+
+            // Draw everything
+            clearCanvas();
+            drawBackground(); // Draw background first
+            drawFloor(); // Draw floor (road)
+            drawEnemies(); // Draw enemies (behind player if they jump over them)
+            drawPlayer(); // Draw player (on top)
+            drawBullets(); // Draw bullets (on top)
+
+
+            // Request next frame
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        // --- Game Over ---
+        function endGame() {
+            gameRunning = false;
+            cancelAnimationFrame(animationFrameId); // Stop the animation loop
+            finalScoreDisplay.textContent = score;
+            gameOverScreen.style.display = 'flex'; // Show game over screen
+        }
+
+        // Restart button event listener
+        restartButton.addEventListener('click', initializeGame);
+
+        // Initial setup - wait for images to load
+        // The initializeGame() call is now inside imageLoaded()
+    </script>
 </body>
 </html>
