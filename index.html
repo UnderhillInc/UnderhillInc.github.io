@@ -7,26 +7,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0;
+            margin: 0; /* Remove default body margin */
+            padding: 0; /* Remove default body padding */
             overflow: hidden; /* Hide scrollbars */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh; /* Full viewport height */
+            width: 100vw; /* Full viewport width */
             background-color: #1a1a2e; /* Dark background */
             color: #e0e0e0;
             font-family: 'Press Start 2P', cursive; /* Pixel font */
             text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Include padding/border in element's total width/height */
         }
 
         h1 {
             color: #00f0ff; /* Bright blue title */
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Reduced margin */
             font-size: 2em;
             text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+            flex-shrink: 0; /* Prevent shrinking when space is tight */
         }
 
         #game-container {
@@ -39,9 +41,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
-            max-width: 98vw; /* Max width for responsiveness */
-            max-height: 95vh; /* Max height for responsiveness */
+            /* Removed fixed padding here to allow canvas to fill */
+            flex-grow: 1; /* Allow container to grow and take available space */
+            width: 100%; /* Take full width of parent */
+            height: 100%; /* Take full height of parent */
             box-sizing: border-box;
         }
 
@@ -50,6 +53,7 @@
             display: block;
             border-radius: 10px;
             touch-action: none; /* Prevent default touch actions like scrolling/zooming */
+            flex-grow: 1; /* Allow canvas to grow within its container */
         }
 
         #game-info {
@@ -59,6 +63,7 @@
             padding: 10px 20px;
             font-size: 0.9em;
             color: #e0e0e0;
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         #game-over-screen {
@@ -101,9 +106,10 @@
         }
 
         #controls {
-            margin-top: 20px;
+            margin-top: 10px; /* Reduced margin */
             font-size: 0.8em;
             color: #a0a0a0;
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         /* Responsive adjustments */
@@ -132,10 +138,11 @@
             display: flex;
             justify-content: space-around;
             width: 100%;
-            margin-top: 20px;
+            margin-top: 10px; /* Reduced margin */
             padding: 0 10px;
             box-sizing: border-box;
             flex-wrap: wrap; /* Allow buttons to wrap */
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         .touch-button {
@@ -340,28 +347,42 @@
 
         // Function to set canvas dimensions based on container and aspect ratio
         function setCanvasDimensions() {
-            const minWidth = 860; // Minimum width as requested
-            const minHeight = 540; // Minimum height as requested
+            const minGameWidth = 860;
+            const minGameHeight = 540;
+            const aspectRatio = minGameWidth / minGameHeight;
 
-            const container = document.getElementById('game-container');
-            const containerWidth = container.clientWidth - 20; // Account for padding
-            const containerHeight = container.clientHeight - 80; // Account for info bar and some padding
+            // Calculate available space for the canvas within the game-container
+            // Account for title, info bar, and controls
+            const headerHeight = document.querySelector('h1').offsetHeight;
+            const infoHeight = document.getElementById('game-info').offsetHeight;
+            const controlsHeight = document.getElementById('controls').offsetHeight;
+            const touchControlsHeight = document.getElementById('touch-controls').offsetHeight; // Might be 0 on desktop
 
-            let newWidth = Math.max(minWidth, containerWidth);
-            let newHeight = Math.max(minHeight, containerHeight);
+            // Total vertical space taken by UI elements (approximate)
+            const uiHeight = headerHeight + infoHeight + controlsHeight + touchControlsHeight + 40; // Add some buffer
 
-            // Prioritize minimum dimensions, then scale to fit container while maintaining aspect ratio
-            const aspectRatio = minWidth / minHeight;
+            const availableWidth = window.innerWidth;
+            const availableHeight = window.innerHeight - uiHeight;
 
-            if (newWidth / aspectRatio > containerHeight) {
-                newHeight = containerHeight;
+            let newWidth = availableWidth;
+            let newHeight = availableWidth / aspectRatio;
+
+            if (newHeight > availableHeight) {
+                newHeight = availableHeight;
                 newWidth = newHeight * aspectRatio;
             }
-            if (newHeight * aspectRatio > containerWidth) { // Check if width would exceed container
-                newWidth = containerWidth;
-                newHeight = newWidth / aspectRatio;
+
+            // Ensure minimum dimensions are met
+            if (newWidth < minGameWidth) {
+                newWidth = minGameWidth;
+                newHeight = minGameWidth / aspectRatio;
+            }
+            if (newHeight < minGameHeight) {
+                newHeight = minGameHeight;
+                newWidth = minGameHeight * aspectRatio;
             }
 
+            // Set canvas dimensions
             canvas.width = Math.floor(newWidth);
             canvas.height = Math.floor(newHeight);
 
