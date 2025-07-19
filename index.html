@@ -12,7 +12,8 @@
             font-family: 'Inter', sans-serif;
         }
         .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://placehold.co/1920x1080/228B22/FFFFFF?text=Lush+Garden') no-repeat center center;
+            /* Image from Pexels */
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.pexels.com/photos/413195/pexels-photo-413195.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center;
             background-size: cover;
         }
         .service-card {
@@ -38,17 +39,17 @@
                 <a href="#about" class="text-gray-600 hover:text-green-600 transition">About</a>
                 <a href="#contact" class="text-gray-600 hover:text-green-600 transition">Contact</a>
             </div>
-            <a href="#contact" class="hidden md:inline-block bg-green-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-700 transition">Book Now</a>
+            <a href="#booking-form" class="hidden md:inline-block bg-green-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-700 transition">Book Now</a>
             <button id="mobile-menu-button" class="md:hidden text-gray-800">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
         </nav>
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white">
-            <a href="#services" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Services</a>
-            <a href="#about" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">About</a>
-            <a href="#contact" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Contact</a>
-            <a href="#contact" class="block px-6 py-4 bg-green-600 text-white text-center font-semibold hover:bg-green-700">Book Now</a>
+            <a href="#services" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 mobile-link">Services</a>
+            <a href="#about" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 mobile-link">About</a>
+            <a href="#contact" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 mobile-link">Contact</a>
+            <a href="#booking-form" class="block px-6 py-4 bg-green-600 text-white text-center font-semibold hover:bg-green-700 mobile-link">Book Now</a>
         </div>
     </header>
 
@@ -72,7 +73,7 @@
 
                 <!-- Grass Cutting Card -->
                 <div class="service-card bg-gray-50 rounded-xl overflow-hidden shadow-lg">
-                    <img src="https://placehold.co/600x400/228B22/FFFFFF?text=Pristine+Lawn" alt="Perfectly cut grass" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                    <img src="https://images.pexels.com/photos/295809/pexels-photo-295809.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Perfectly cut grass" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
                     <div class="p-8">
                         <h3 class="text-2xl font-bold mb-3 text-gray-900">Lawn Mowing & Care</h3>
                         <p class="text-gray-600 mb-6">From one-off cuts to regular maintenance plans, we ensure your lawn is healthy, green, and beautifully manicured.</p>
@@ -81,13 +82,13 @@
                             <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Edging and Trimming</li>
                             <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Weed and Moss Control</li>
                         </ul>
-                        <a href="#contact" class="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 transition w-full text-center">Get a Free Quote</a>
+                        <a href="#booking-form" class="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 transition w-full text-center">Get a Free Quote</a>
                     </div>
                 </div>
 
                 <!-- Hot Tub Valet Card -->
                 <div class="service-card bg-gray-50 rounded-xl overflow-hidden shadow-lg">
-                    <img src="https://placehold.co/600x400/1E90FF/FFFFFF?text=Sparkling+Hot+Tub" alt="Clean hot tub" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                    <img src="https://images.pexels.com/photos/3893793/pexels-photo-3893793.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Clean hot tub" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
                     <div class="p-8">
                         <h3 class="text-2xl font-bold mb-3 text-gray-900">Hot Tub Valet</h3>
                         <p class="text-gray-600 mb-6">Relax and unwind in a crystal-clear hot tub. Our full valet service keeps your spa hygienic and in perfect working order.</p>
@@ -96,13 +97,13 @@
                              <li><i class="fas fa-check-circle text-blue-500 mr-2"></i>Water Quality Testing</li>
                              <li><i class="fas fa-check-circle text-blue-500 mr-2"></i>Filter & Component Check</li>
                         </ul>
-                        <a href="#contact" class="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition w-full text-center">Book a Valet</a>
+                        <a href="#booking-form" class="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition w-full text-center">Book a Valet</a>
                     </div>
                 </div>
 
                 <!-- Tree Surgery Card -->
                 <div class="service-card bg-gray-50 rounded-xl overflow-hidden shadow-lg">
-                    <img src="https://placehold.co/600x400/8B4513/FFFFFF?text=Expert+Tree+Care" alt="Tree surgeon at work" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                    <img src="https://images.pexels.com/photos/5676340/pexels-photo-5676340.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Tree surgeon at work" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
                     <div class="p-8">
                         <h3 class="text-2xl font-bold mb-3 text-gray-900">Tree Surgery</h3>
                         <p class="text-gray-600 mb-6">Safe and professional tree care, from pruning and shaping to complete removal. Fully qualified and insured for your peace of mind.</p>
@@ -111,7 +112,7 @@
                             <li><i class="fas fa-check-circle text-yellow-700 mr-2"></i>Felling and Removal</li>
                             <li><i class="fas fa-check-circle text-yellow-700 mr-2"></i>Stump Grinding</li>
                         </ul>
-                        <a href="#contact" class="inline-block bg-yellow-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-yellow-900 transition w-full text-center">Request an Assessment</a>
+                        <a href="#booking-form" class="inline-block bg-yellow-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-yellow-900 transition w-full text-center">Request an Assessment</a>
                     </div>
                 </div>
             </div>
@@ -123,7 +124,7 @@
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row items-center gap-12">
                 <div class="md:w-1/2">
-                    <img src="https://placehold.co/600x600/333333/FFFFFF?text=Paul+Ellis" alt="Paul Ellis, Owner" class="rounded-xl shadow-2xl w-full" onerror="this.onerror=null;this.src='https://placehold.co/600x600/cccccc/ffffff?text=Image+Not+Found';">
+                    <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Paul Ellis, Owner" class="rounded-xl shadow-2xl w-full h-auto object-cover" style="max-height: 500px;" onerror="this.onerror=null;this.src='https://placehold.co/600x600/cccccc/ffffff?text=Image+Not+Found';">
                 </div>
                 <div class="md:w-1/2">
                     <h2 class="text-4xl font-bold text-gray-900 mb-4">Meet Paul Ellis</h2>
@@ -134,14 +135,28 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-white">
+    <!-- Booking Form Section -->
+    <section id="booking-form" class="py-20 bg-white">
         <div class="container mx-auto px-6">
             <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-gray-900">Ready to Book?</h2>
-                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Get in touch today for a no-obligation quote or to schedule your appointment. We're here to help!</p>
+                <h2 class="text-4xl font-bold text-gray-900">Book Online</h2>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Fill out the form below to request an appointment. We'll review your request and get back to you within 24 hours to confirm.</p>
             </div>
-            <div class="max-w-4xl mx-auto bg-gray-50 p-8 rounded-xl shadow-lg">
+            <div class="max-w-4xl mx-auto bg-gray-50 p-4 md:p-8 rounded-xl shadow-lg">
+                <!-- IMPORTANT: Replace the src attribute below with the embed link to your own Google Form -->
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwgL2i3tS_xW8xL2s8c4a9b9c9d9e9f9g9h9i9j9k9l9m9n/viewform?embedded=true" width="100%" height="950" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900">Or Contact Us Directly</h2>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">If you prefer, you can also reach us by phone or email.</p>
+            </div>
+            <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
                 <div class="grid md:grid-cols-2 gap-8 text-center">
                     <div class="p-6">
                         <i class="fas fa-phone text-4xl text-green-600 mb-4"></i>
@@ -175,18 +190,32 @@
         // Mobile menu toggle
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
 
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when a link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
         });
 
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                     targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
     </script>
