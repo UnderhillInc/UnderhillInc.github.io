@@ -3,877 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Side-Scrolling Shooter</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>Ellis Home & Garden Services - Lawn, Hot Tub & Tree Care</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            margin: 0; /* Remove default body margin */
-            padding: 0; /* Remove default body padding */
-            overflow: hidden; /* Hide scrollbars */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh; /* Full viewport height */
-            width: 100vw; /* Full viewport width */
-            background-color: #1a1a2e; /* Dark background */
-            color: #e0e0e0;
-            font-family: 'Press Start 2P', cursive; /* Pixel font */
-            text-align: center;
-            box-sizing: border-box; /* Include padding/border in element's total width/height */
+            font-family: 'Inter', sans-serif;
         }
-
-        h1 {
-            color: #00f0ff; /* Bright blue title */
-            margin-bottom: 10px; /* Reduced margin */
-            font-size: 2em;
-            text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-            flex-shrink: 0; /* Prevent shrinking when space is tight */
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://placehold.co/1920x1080/228B22/FFFFFF?text=Lush+Garden') no-repeat center center;
+            background-size: cover;
         }
-
-        #game-container {
-            position: relative;
-            background-color: #0d0d1a; /* Even darker game background */
-            border: 4px solid #00f0ff; /* Border matching title */
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* Removed fixed padding here to allow canvas to fill */
-            flex-grow: 1; /* Allow container to grow and take available space */
-            width: 100%; /* Take full width of parent */
-            height: 100%; /* Take full height of parent */
-            box-sizing: border-box;
+        .service-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        canvas {
-            background-color: #05050a; /* Deepest background for canvas */
-            display: block;
-            border-radius: 10px;
-            touch-action: none; /* Prevent default touch actions like scrolling/zooming */
-            flex-grow: 1; /* Allow canvas to grow within its container */
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-
-        #game-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            padding: 10px 20px;
-            font-size: 0.9em;
-            color: #e0e0e0;
-            flex-shrink: 0; /* Prevent shrinking */
-        }
-
-        #game-over-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #ff0077; /* Game over color */
-            font-size: 2em;
-            text-shadow: 0 0 10px #ff0077;
-            z-index: 100;
-            border-radius: 10px;
-            display: none; /* Hidden by default */
-        }
-
-        #game-over-screen button {
-            background-color: #00f0ff;
-            color: #1a1a2e;
-            border: none;
-            padding: 15px 30px;
-            margin-top: 20px;
-            border-radius: 8px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 1em;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 240, 255, 0.5);
-            transition: all 0.3s ease;
-        }
-
-        #game-over-screen button:hover {
-            background-color: #00b0c0;
-            box-shadow: 0 8px 20px rgba(0, 240, 255, 0.8);
-            transform: translateY(-3px);
-        }
-
-        #controls {
-            margin-top: 10px; /* Reduced margin */
-            font-size: 0.8em;
-            color: #a0a0a0;
-            flex-shrink: 0; /* Prevent shrinking */
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.5em;
-            }
-            #game-info {
-                font-size: 0.8em;
-                padding: 5px 10px;
-            }
-            #game-over-screen {
-                font-size: 1.5em;
-            }
-            #game-over-screen button {
-                padding: 10px 20px;
-                font-size: 0.8em;
-            }
-            #controls {
-                font-size: 0.7em;
-            }
-        }
-
-        /* Touch controls for mobile */
-        #touch-controls {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            margin-top: 10px; /* Reduced margin */
-            padding: 0 10px;
-            box-sizing: border-box;
-            flex-wrap: wrap; /* Allow buttons to wrap */
-            flex-shrink: 0; /* Prevent shrinking */
-        }
-
-        .touch-button {
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            padding: 15px 25px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 12px;
-            box-shadow: 0 4px #999;
-            transition: all 0.2s ease;
-            flex: 1; /* Distribute space evenly */
-            max-width: 120px; /* Limit button size */
-            min-width: 80px; /* Ensure buttons aren't too small */
-        }
-
-        .touch-button:active {
-            background-color: #3e8e41;
-            box-shadow: 0 2px #666;
-            transform: translateY(2px);
-        }
-
-        #fire-button {
-            background-color: #f44336; /* Red */
-        }
-        #fire-button:active {
-            background-color: #da190b;
-        }
-
-        #reload-button {
-            background-color: #2196F3; /* Blue */
-        }
-        #reload-button:active {
-            background-color: #0b7dda;
-        }
-
-        /* Hide touch controls on desktop */
-        @media (min-width: 769px) {
-            #touch-controls {
-                display: none;
-            }
-        }
-
-        /* Show touch controls on mobile */
-        @media (max-width: 768px) {
-            #touch-controls {
-                display: flex;
-            }
-        }
-
     </style>
 </head>
-<body>
-    <h1>Side-Scrolling Shooter</h1>
-    <div id="game-container">
-        <div id="game-info">
-            <span id="score-display">SCORE: 0</span>
-            <span id="health-display">HEALTH: 100</span>
-            <span id="ammo-display">AMMO: 8/8</span>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-gray-900">
+                <i class="fas fa-leaf text-green-600"></i>
+                Ellis Home & Garden
+            </a>
+            <div class="hidden md:flex space-x-6">
+                <a href="#services" class="text-gray-600 hover:text-green-600 transition">Services</a>
+                <a href="#about" class="text-gray-600 hover:text-green-600 transition">About</a>
+                <a href="#contact" class="text-gray-600 hover:text-green-600 transition">Contact</a>
+            </div>
+            <a href="#contact" class="hidden md:inline-block bg-green-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-700 transition">Book Now</a>
+            <button id="mobile-menu-button" class="md:hidden text-gray-800">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white">
+            <a href="#services" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Services</a>
+            <a href="#about" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">About</a>
+            <a href="#contact" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Contact</a>
+            <a href="#contact" class="block px-6 py-4 bg-green-600 text-white text-center font-semibold hover:bg-green-700">Book Now</a>
         </div>
-        <canvas id="gameCanvas"></canvas>
-        <div id="game-over-screen">
-            <h2>GAME OVER!</h2>
-            <p>Your Score: <span id="final-score">0</span></p>
-            <button id="restart-button">RESTART GAME</button>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-white text-center py-24 md:py-40">
+        <div class="container mx-auto px-6">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">Your Property, Perfectly Maintained</h1>
+            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Professional lawn care, hot tub valeting, and tree surgery services by Paul Ellis. Reliable, high-quality, and tailored to your needs.</p>
+            <a href="#services" class="bg-white text-green-700 font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-200 transition transform hover:scale-105">Explore Our Services</a>
         </div>
-    </div>
-    <div id="controls">
-        <p>Use <strong>Arrow Keys</strong> to move. <strong>Click Mouse</strong> to shoot. Press <strong>R</strong> to reload.</p>
-    </div>
-    <div id="touch-controls">
-        <button class="touch-button" id="up-button">▲</button>
-        <button class="touch-button" id="left-button">◀</button>
-        <button class="touch-button" id="right-button">▶</button>
-        <button class="touch-button" id="down-button">▼</button>
-        <button class="touch-button" id="fire-button">FIRE</button>
-        <button class="touch-button" id="reload-button">RELOAD</button>
-    </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900">Our Services</h2>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">We provide a range of expert services to keep your home and garden in pristine condition. Quality and customer satisfaction guaranteed.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+                <!-- Grass Cutting Card -->
+                <div class="service-card bg-gray-50 rounded-xl overflow-hidden shadow-lg">
+                    <img src="https://placehold.co/600x400/228B22/FFFFFF?text=Pristine+Lawn" alt="Perfectly cut grass" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold mb-3 text-gray-900">Lawn Mowing & Care</h3>
+                        <p class="text-gray-600 mb-6">From one-off cuts to regular maintenance plans, we ensure your lawn is healthy, green, and beautifully manicured.</p>
+                        <ul class="space-y-2 text-gray-700 mb-6">
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Precision Mowing</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Edging and Trimming</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Weed and Moss Control</li>
+                        </ul>
+                        <a href="#contact" class="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 transition w-full text-center">Get a Free Quote</a>
+                    </div>
+                </div>
+
+                <!-- Hot Tub Valet Card -->
+                <div class="service-card bg-gray-50 rounded-xl overflow-hidden shadow-lg">
+                    <img src="https://placehold.co/600x400/1E90FF/FFFFFF?text=Sparkling+Hot+Tub" alt="Clean hot tub" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold mb-3 text-gray-900">Hot Tub Valet</h3>
+                        <p class="text-gray-600 mb-6">Relax and unwind in a crystal-clear hot tub. Our full valet service keeps your spa hygienic and in perfect working order.</p>
+                        <ul class="space-y-2 text-gray-700 mb-6">
+                             <li><i class="fas fa-check-circle text-blue-500 mr-2"></i>Deep Clean & Sanitisation</li>
+                             <li><i class="fas fa-check-circle text-blue-500 mr-2"></i>Water Quality Testing</li>
+                             <li><i class="fas fa-check-circle text-blue-500 mr-2"></i>Filter & Component Check</li>
+                        </ul>
+                        <a href="#contact" class="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition w-full text-center">Book a Valet</a>
+                    </div>
+                </div>
+
+                <!-- Tree Surgery Card -->
+                <div class="service-card bg-gray-50 rounded-xl overflow-hidden shadow-lg">
+                    <img src="https://placehold.co/600x400/8B4513/FFFFFF?text=Expert+Tree+Care" alt="Tree surgeon at work" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold mb-3 text-gray-900">Tree Surgery</h3>
+                        <p class="text-gray-600 mb-6">Safe and professional tree care, from pruning and shaping to complete removal. Fully qualified and insured for your peace of mind.</p>
+                        <ul class="space-y-2 text-gray-700 mb-6">
+                            <li><i class="fas fa-check-circle text-yellow-700 mr-2"></i>Crown Reduction & Lifting</li>
+                            <li><i class="fas fa-check-circle text-yellow-700 mr-2"></i>Felling and Removal</li>
+                            <li><i class="fas fa-check-circle text-yellow-700 mr-2"></i>Stump Grinding</li>
+                        </ul>
+                        <a href="#contact" class="inline-block bg-yellow-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-yellow-900 transition w-full text-center">Request an Assessment</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <img src="https://placehold.co/600x600/333333/FFFFFF?text=Paul+Ellis" alt="Paul Ellis, Owner" class="rounded-xl shadow-2xl w-full" onerror="this.onerror=null;this.src='https://placehold.co/600x600/cccccc/ffffff?text=Image+Not+Found';">
+                </div>
+                <div class="md:w-1/2">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">Meet Paul Ellis</h2>
+                    <p class="text-gray-600 mb-6 text-lg">"With over 15 years of experience, I started Ellis Home & Garden to provide a service that's not just professional, but personal. I believe in treating every property as if it were my own, delivering exceptional results with a friendly, reliable approach. Your satisfaction is my top priority."</p>
+                    <p class="text-gray-800 font-semibold">- Paul Ellis, Founder</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900">Ready to Book?</h2>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Get in touch today for a no-obligation quote or to schedule your appointment. We're here to help!</p>
+            </div>
+            <div class="max-w-4xl mx-auto bg-gray-50 p-8 rounded-xl shadow-lg">
+                <div class="grid md:grid-cols-2 gap-8 text-center">
+                    <div class="p-6">
+                        <i class="fas fa-phone text-4xl text-green-600 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Call Us</h3>
+                        <p class="text-gray-600">Speak to us directly for a quick response.</p>
+                        <a href="tel:07123456789" class="text-xl text-green-700 font-semibold hover:underline mt-2 inline-block">07123 456 789</a>
+                    </div>
+                    <div class="p-6">
+                        <i class="fas fa-envelope text-4xl text-green-600 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Email Us</h3>
+                        <p class="text-gray-600">Send us your requirements and we'll get back to you.</p>
+                        <a href="mailto:paul@ellishomeandgarden.co.uk" class="text-xl text-green-700 font-semibold hover:underline mt-2 inline-block">paul@ellishomeandgarden.co.uk</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-10">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 Ellis Home & Garden Services. All Rights Reserved.</p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f text-xl"></i></a>
+                <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // Get the canvas and its 2D rendering context
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-        // Get game info and game over screen elements
-        const scoreDisplay = document.getElementById('score-display');
-        const healthDisplay = document.getElementById('health-display');
-        const ammoDisplay = document.getElementById('ammo-display');
-        const gameOverScreen = document.getElementById('game-over-screen');
-        const finalScoreDisplay = document.getElementById('final-score');
-        const restartButton = document.getElementById('restart-button');
-
-        // Game state variables
-        let gameRunning = false;
-        let score = 0;
-        let health = 100;
-        let animationFrameId; // To store the requestAnimationFrame ID for cancellation
-
-        // Image assets
-        const backgroundImage = new Image();
-        backgroundImage.src = 'background.png';
-        const roadImage = new Image();
-        roadImage.src = 'road.png.jpg';
-        const enblobImage = new Image();
-        enblobImage.src = 'enblob.png';
-        const gunImage = new Image();
-        gunImage.src = 'gun.png';
-
-        let imagesLoaded = 0;
-        const totalImages = 4; // Update this if you add/remove images
-
-        function imageLoaded() {
-            imagesLoaded++;
-            if (imagesLoaded === totalImages) {
-                console.log("All images loaded.");
-                initializeGame();
-            }
-        }
-
-        backgroundImage.onload = imageLoaded;
-        roadImage.onload = imageLoaded;
-        enblobImage.onload = imageLoaded;
-        gunImage.onload = imageLoaded;
-
-        // Fallback for image loading errors
-        backgroundImage.onerror = () => { console.error("Failed to load background.png"); imageLoaded(); };
-        roadImage.onerror = () => { console.error("Failed to load road.png.jpg"); imageLoaded(); };
-        enblobImage.onerror = () => { console.error("Failed to load enblob.png"); imageLoaded(); };
-        gunImage.onerror = () => { console.error("Failed to load gun.png"); imageLoaded(); };
-
-
-        // Player properties (now a person)
-        const player = {
-            x: 50,
-            y: 0, // Will be set to floor position
-            width: 30, // Body width
-            height: 45, // Body height
-            speed: 5,
-            color: '#00ff00', // Green (for drawing if image fails)
-            velocityY: 0,
-            onGround: false,
-            jumpStrength: 10
-        };
-
-        // Player weapon properties
-        const gun = {
-            width: 40, // Width of the gun image
-            height: 20, // Height of the gun image
-            offsetX: 10, // Offset from player center to draw gun
-            offsetY: 0,
-            angle: 0 // Current rotation angle of the gun
-        };
-
-        // Mouse position for aiming
-        let mouseX = 0;
-        let mouseY = 0;
-
-        // Game physics constants
-        const gravity = 0.5; // pixels/frame^2
-        let floorHeight = 20; // Height of the floor from the bottom of the canvas
-
-        // Background scrolling
-        let backgroundX = 0;
-        const backgroundScrollSpeed = 0.5; // Speed at which the background scrolls left
-
-        // Keyboard input state
-        const keys = {
-            ArrowUp: false,
-            ArrowDown: false,
-            ArrowLeft: false,
-            ArrowRight: false,
-            KeyR: false // Key for reload
-        };
-
-        // Bullet properties
-        const bullets = [];
-        const bulletSpeed = 15; // Increased bullet speed
-        const bulletRadius = 5; // For circular bullets
-        const bulletColor = '#ffff00'; // Yellow
-        let lastShotTime = 0;
-        const shotCooldown = 200; // milliseconds
-
-        // Ammo properties
-        const maxAmmo = 8; // Changed max ammo
-        let currentAmmo = maxAmmo;
-        let isReloading = false;
-        const reloadTime = 1500; // milliseconds (1.5 seconds)
-
-        // Enemy properties
-        const enemies = [];
-        const enemySpeed = 2;
-        const enemyWidth = 40; // Adjusted for enblob.png
-        const enemyHeight = 40; // Adjusted for enblob.png
-        const enemyColor = '#ff0000'; // Red (for drawing if image fails)
-        let lastEnemySpawnTime = 0;
-        const enemySpawnInterval = 1500; // milliseconds
-
-        // Function to set canvas dimensions based on container and aspect ratio
-        function setCanvasDimensions() {
-            const minGameWidth = 860;
-            const minGameHeight = 540;
-            const aspectRatio = minGameWidth / minGameHeight;
-
-            // Calculate available space for the canvas within the game-container
-            // Account for title, info bar, and controls
-            const headerHeight = document.querySelector('h1').offsetHeight;
-            const infoHeight = document.getElementById('game-info').offsetHeight;
-            const controlsHeight = document.getElementById('controls').offsetHeight;
-            const touchControlsHeight = document.getElementById('touch-controls').offsetHeight; // Might be 0 on desktop
-
-            // Total vertical space taken by UI elements (approximate)
-            const uiHeight = headerHeight + infoHeight + controlsHeight + touchControlsHeight + 40; // Add some buffer
-
-            const availableWidth = window.innerWidth;
-            const availableHeight = window.innerHeight - uiHeight;
-
-            let newWidth = availableWidth;
-            let newHeight = availableWidth / aspectRatio;
-
-            if (newHeight > availableHeight) {
-                newHeight = availableHeight;
-                newWidth = newHeight * aspectRatio;
-            }
-
-            // Ensure minimum dimensions are met
-            if (newWidth < minGameWidth) {
-                newWidth = minGameWidth;
-                newHeight = minGameWidth / aspectRatio;
-            }
-            if (newHeight < minGameHeight) {
-                newHeight = minGameHeight;
-                newWidth = minGameHeight * aspectRatio;
-            }
-
-            // Set canvas dimensions
-            canvas.width = Math.floor(newWidth);
-            canvas.height = Math.floor(newHeight);
-
-            // Adjust player initial position to be on the floor
-            player.y = canvas.height - player.height - floorHeight;
-            player.onGround = true; // Player starts on the ground
-        }
-
-        // --- Game Initialization and Reset ---
-        function initializeGame() {
-            setCanvasDimensions(); // Set initial canvas size
-            window.addEventListener('resize', setCanvasDimensions); // Adjust on resize
-
-            score = 0;
-            health = 100;
-            currentAmmo = maxAmmo; // Reset ammo
-            isReloading = false;
-            player.x = 50;
-            player.y = canvas.height - player.height - floorHeight; // Recalculate player Y
-            player.velocityY = 0;
-            player.onGround = true;
-            bullets.length = 0; // Clear bullets array
-            enemies.length = 0; // Clear enemies array
-            lastShotTime = 0;
-            lastEnemySpawnTime = 0;
-            backgroundX = 0; // Reset background position
-
-            updateScoreDisplay();
-            updateHealthDisplay();
-            updateAmmoDisplay(); // Update ammo display
-            gameOverScreen.style.display = 'none';
-            gameRunning = true;
-
-            // Start the game loop
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId); // Cancel any existing loop
-            }
-            gameLoop();
-        }
-
-        // --- Input Handling ---
-        document.addEventListener('keydown', (e) => {
-            if (e.code in keys) {
-                keys[e.code] = true;
-                e.preventDefault(); // Prevent default browser actions (e.g., scrolling)
-            }
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
         });
 
-        document.addEventListener('keyup', (e) => {
-            if (e.code in keys) {
-                keys[e.code] = false;
-            }
-        });
-
-        // Mouse movement for aiming
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            mouseX = e.clientX - rect.left;
-            mouseY = e.clientY - rect.top;
-        });
-
-        // Mouse click for shooting
-        canvas.addEventListener('click', (e) => {
-            if (!gameRunning) return; // Only allow shooting if game is running
-
-            const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-
-            // Player center for bullet origin
-            const playerCenterX = player.x + player.width / 2;
-            const playerCenterY = player.y + player.height / 2;
-
-            if ((performance.now() - lastShotTime > shotCooldown) && currentAmmo > 0 && !isReloading) {
-                // Calculate direction vector from player to click
-                const dx = clickX - playerCenterX;
-                const dy = clickY - playerCenterY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                // Normalize and scale by bullet speed
-                const bulletDx = (dx / distance) * bulletSpeed;
-                const bulletDy = (dy / distance) * bulletSpeed;
-
-                bullets.push({
-                    x: playerCenterX, // Start from player center
-                    y: playerCenterY,
-                    radius: bulletRadius,
-                    color: bulletColor,
-                    dx: bulletDx,
-                    dy: bulletDy
-                });
-                lastShotTime = performance.now();
-                currentAmmo--; // Consume ammo
-                updateAmmoDisplay();
-            }
-        });
-
-
-        // Touch controls
-        const touchButtons = {
-            'up-button': 'ArrowUp',
-            'down-button': 'ArrowDown',
-            'left-button': 'ArrowLeft',
-            'right-button': 'ArrowRight',
-            'reload-button': 'KeyR' // New reload button
-        };
-
-        for (const [id, keyName] of Object.entries(touchButtons)) {
-            const button = document.getElementById(id);
-            if (button) {
-                button.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); // Prevent long press context menu etc.
-                    keys[keyName] = true;
-                }, { passive: false }); // Use passive: false for preventDefault
-                button.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    keys[keyName] = false;
-                });
-            }
-        }
-
-        // Touch fire button
-        const fireButton = document.getElementById('fire-button');
-        if (fireButton) {
-            fireButton.addEventListener('touchstart', (e) => {
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                if (!gameRunning) return;
-
-                // Player center for bullet origin
-                const playerCenterX = player.x + player.width / 2;
-                const playerCenterY = player.y + player.height / 2;
-
-                // For touch fire, we'll just fire straight ahead or towards a default point for simplicity
-                // Or, if multi-touch, we could use a second touch for aiming.
-                // For now, let's just fire horizontally to the right.
-                const dx = 1; // Fire right
-                const dy = 0; // No vertical component
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                const bulletDx = (dx / distance) * bulletSpeed;
-                const bulletDy = (dy / distance) * bulletSpeed;
-
-                if ((performance.now() - lastShotTime > shotCooldown) && currentAmmo > 0 && !isReloading) {
-                    bullets.push({
-                        x: playerCenterX,
-                        y: playerCenterY,
-                        radius: bulletRadius,
-                        color: bulletColor,
-                        dx: bulletDx,
-                        dy: bulletDy
-                    });
-                    lastShotTime = performance.now();
-                    currentAmmo--;
-                    updateAmmoDisplay();
-                }
-            }, { passive: false });
-        }
-
-
-        // --- Game Logic Functions ---
-
-        // Update player position based on input and gravity
-        function updatePlayer() {
-            // Horizontal movement
-            if (keys.ArrowLeft) player.x -= player.speed;
-            if (keys.ArrowRight) player.x += player.speed;
-
-            // Jumping (only if on ground)
-            if (keys.ArrowUp && player.onGround) {
-                player.velocityY = -player.jumpStrength;
-                player.onGround = false;
-            }
-
-            // Apply gravity
-            player.velocityY += gravity;
-            player.y += player.velocityY;
-
-            // Check for floor collision
-            const floorY = canvas.height - player.height - floorHeight;
-            if (player.y >= floorY) {
-                player.y = floorY;
-                player.velocityY = 0;
-                player.onGround = true;
-            }
-
-            // Keep player within canvas horizontal boundaries
-            if (player.x < 0) player.x = 0;
-            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
-
-            // Reload if 'R' is pressed and not already reloading and ammo is not full
-            if (keys.KeyR && !isReloading && currentAmmo < maxAmmo) {
-                isReloading = true;
-                ammoDisplay.textContent = `RELOADING...`; // Indicate reloading
-                setTimeout(() => {
-                    currentAmmo = maxAmmo;
-                    isReloading = false;
-                    updateAmmoDisplay();
-                }, reloadTime);
-            }
-
-            // Update gun angle to follow mouse
-            const playerCenterX = player.x + player.width / 2;
-            const playerCenterY = player.y + player.height / 2;
-            gun.angle = Math.atan2(mouseY - playerCenterY, mouseX - playerCenterX);
-        }
-
-        // Update bullet positions
-        function updateBullets() {
-            for (let i = bullets.length - 1; i >= 0; i--) {
-                bullets[i].x += bullets[i].dx;
-                bullets[i].y += bullets[i].dy;
-                // Remove bullets that go off-screen
-                if (bullets[i].x - bullets[i].radius > canvas.width ||
-                    bullets[i].x + bullets[i].radius < 0 ||
-                    bullets[i].y - bullets[i].radius > canvas.height ||
-                    bullets[i].y + bullets[i].radius < 0) {
-                    bullets.splice(i, 1);
-                }
-            }
-        }
-
-        // Spawn new enemies
-        function spawnEnemies() {
-            if (performance.now() - lastEnemySpawnTime > enemySpawnInterval) {
-                // Spawn enemies at random Y positions above the floor
-                const spawnY = Math.random() * (canvas.height - floorHeight - enemyHeight);
-                enemies.push({
-                    x: canvas.width, // Start at the right edge
-                    y: spawnY,
-                    width: enemyWidth,
-                    height: enemyHeight,
-                    color: enemyColor // Fallback color
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
                 });
-                lastEnemySpawnTime = performance.now();
-            }
-        }
-
-        // Update enemy positions
-        function updateEnemies() {
-            for (let i = enemies.length - 1; i >= 0; i--) {
-                enemies[i].x -= enemySpeed;
-                // Remove enemies that go off-screen
-                if (enemies[i].x + enemies[i].width < 0) {
-                    enemies.splice(i, 1);
-                }
-            }
-        }
-
-        // Simple AABB (Axis-Aligned Bounding Box) collision detection for rectangles
-        function checkRectCollision(rect1, rect2) {
-            return rect1.x < rect2.x + rect2.width &&
-                   rect1.x + rect1.width > rect2.x &&
-                   rect1.y < rect2.y + rect2.height &&
-                   rect1.y + rect1.height > rect2.y;
-        }
-
-        // Collision detection for circle (bullet) and rectangle (enemy)
-        function checkCircleRectCollision(circle, rect) {
-            // Find the closest point on the rectangle to the center of the circle
-            let testX = circle.x;
-            let testY = circle.y;
-
-            if (circle.x < rect.x) {
-                testX = rect.x;
-            } else if (circle.x > rect.x + rect.width) {
-                testX = rect.x + rect.width;
-            }
-
-            if (circle.y < rect.y) {
-                testY = rect.y;
-            } else if (circle.y > rect.y + rect.height) {
-                testY = rect.y + rect.height;
-            }
-
-            // Calculate the distance between the closest point and the circle's center
-            let distX = circle.x - testX;
-            let distY = circle.y - testY;
-            let distance = Math.sqrt((distX * distX) + (distY * distY));
-
-            // Check if the distance is less than the circle's radius
-            return distance <= circle.radius;
-        }
-
-
-        // Handle collisions between bullets and enemies, and player and enemies
-        function handleCollisions() {
-            // Bullet-Enemy collisions
-            for (let i = bullets.length - 1; i >= 0; i--) {
-                for (let j = enemies.length - 1; j >= 0; j--) {
-                    // Treat enemy as a rectangle for collision with circular bullet
-                    if (checkCircleRectCollision(bullets[i], enemies[j])) {
-                        bullets.splice(i, 1);
-                        enemies.splice(j, 1);
-                        score += 10;
-                        updateScoreDisplay();
-                        break; // Bullet is removed, so move to next bullet
-                    }
-                }
-            }
-
-            // Player-Enemy collisions
-            for (let i = enemies.length - 1; i >= 0; i--) {
-                // Player's main body for collision
-                const playerBody = {
-                    x: player.x,
-                    y: player.y,
-                    width: player.width,
-                    height: player.height
-                };
-                if (checkRectCollision(playerBody, enemies[i])) {
-                    enemies.splice(i, 1);
-                    health -= 20; // Player takes damage
-                    updateHealthDisplay();
-                    if (health <= 0) {
-                        endGame();
-                    }
-                }
-            }
-        }
-
-        // --- Drawing Functions ---
-
-        // Clear the canvas
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        // Draw the scrolling background
-        function drawBackground() {
-            if (!backgroundImage.complete || backgroundImage.naturalWidth === 0) {
-                // Fallback if image not loaded
-                ctx.fillStyle = '#05050a';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                return;
-            }
-
-            // Draw two copies of the background to ensure seamless looping
-            // First copy
-            ctx.drawImage(backgroundImage, backgroundX, 0, canvas.width, canvas.height - floorHeight);
-            // Second copy, positioned to the right of the first
-            ctx.drawImage(backgroundImage, backgroundX + canvas.width, 0, canvas.width, canvas.height - floorHeight);
-
-            // Update background position for scrolling
-            backgroundX -= backgroundScrollSpeed;
-
-            // Loop the background when it goes off-screen
-            if (backgroundX <= -canvas.width) {
-                backgroundX = 0;
-            }
-        }
-
-        // Draw the static floor (road image)
-        function drawFloor() {
-            if (!roadImage.complete || roadImage.naturalWidth === 0) {
-                // Fallback if image not loaded
-                ctx.fillStyle = '#333333';
-                ctx.fillRect(0, canvas.height - floorHeight, canvas.width, floorHeight);
-                return;
-            }
-            // Draw the road image to fill the floor area
-            ctx.drawImage(roadImage, 0, canvas.height - floorHeight, canvas.width, floorHeight);
-        }
-
-        // Draw the player (person model)
-        function drawPlayer() {
-            ctx.fillStyle = player.color;
-
-            // Body
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-
-            // Head (smaller rectangle on top of body)
-            const headWidth = player.width * 0.7;
-            const headHeight = player.height * 0.5;
-            const headX = player.x + (player.width - headWidth) / 2;
-            const headY = player.y - headHeight + 5; // Adjust Y to sit slightly above body
-            ctx.fillRect(headX, headY, headWidth, headHeight);
-
-            // Eyes (simple dots)
-            ctx.fillStyle = '#000000'; // Black eyes
-            ctx.fillRect(headX + headWidth * 0.2, headY + headHeight * 0.3, 3, 3);
-            ctx.fillRect(headX + headWidth * 0.8 - 3, headY + headHeight * 0.3, 3, 3);
-
-            // Draw gun
-            if (gunImage.complete && gunImage.naturalWidth > 0) {
-                ctx.save(); // Save the current canvas state
-
-                // Translate to the player's center (pivot point for rotation)
-                const playerCenterX = player.x + player.width / 2;
-                const playerCenterY = player.y + player.height / 2;
-                ctx.translate(playerCenterX, playerCenterY);
-
-                // Rotate by the calculated angle
-                ctx.rotate(gun.angle);
-
-                // Draw the gun image, offset so its center aligns with the player's center
-                // Adjust offsets based on gun image size and desired position relative to player
-                ctx.drawImage(gunImage, gun.offsetX, gun.offsetY - gun.height / 2, gun.width, gun.height);
-
-                ctx.restore(); // Restore the canvas state
-            }
-        }
-
-        // Draw all active bullets (circular)
-        function drawBullets() {
-            ctx.fillStyle = bulletColor;
-            bullets.forEach(bullet => {
-                ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
-                ctx.fill();
             });
-        }
-
-        // Draw all active enemies (enblob image)
-        function drawEnemies() {
-            enemies.forEach(enemy => {
-                if (enblobImage.complete && enblobImage.naturalWidth > 0) {
-                    ctx.drawImage(enblobImage, enemy.x, enemy.y, enemy.width, enemy.height);
-                } else {
-                    // Fallback to drawing a rectangle if image not loaded
-                    ctx.fillStyle = enemy.color;
-                    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-                }
-            });
-        }
-
-        // Update score display
-        function updateScoreDisplay() {
-            scoreDisplay.textContent = `SCORE: ${score}`;
-        }
-
-        // Update health display
-        function updateHealthDisplay() {
-            healthDisplay.textContent = `HEALTH: ${health}`;
-            // Change color based on health for visual feedback
-            if (health > 70) {
-                healthDisplay.style.color = '#00ff00'; // Green
-            } else if (health > 30) {
-                healthDisplay.style.color = '#ffff00'; // Yellow
-            } else {
-                healthDisplay.style.color = '#ff0000'; // Red
-            }
-        }
-
-        // Update ammo display
-        function updateAmmoDisplay() {
-            if (isReloading) {
-                ammoDisplay.textContent = `RELOADING...`;
-                ammoDisplay.style.color = '#2196F3'; // Blue for reloading
-            } else {
-                ammoDisplay.textContent = `AMMO: ${currentAmmo}/${maxAmmo}`;
-                ammoDisplay.style.color = currentAmmo === 0 ? '#ff0000' : '#e0e0e0'; // Red if empty, else default
-            }
-        }
-
-        // --- Game Loop ---
-        function gameLoop() {
-            if (!gameRunning) return; // Stop the loop if game is not running
-
-            // Update game elements
-            updatePlayer();
-            updateBullets();
-            spawnEnemies();
-            updateEnemies();
-            handleCollisions();
-
-            // Draw everything
-            clearCanvas();
-            drawBackground(); // Draw background first
-            drawFloor(); // Draw floor (road)
-            drawEnemies(); // Draw enemies (behind player if they jump over them)
-            drawPlayer(); // Draw player (on top)
-            drawBullets(); // Draw bullets (on top)
-
-
-            // Request next frame
-            animationFrameId = requestAnimationFrame(gameLoop);
-        }
-
-        // --- Game Over ---
-        function endGame() {
-            gameRunning = false;
-            cancelAnimationFrame(animationFrameId); // Stop the animation loop
-            finalScoreDisplay.textContent = score;
-            gameOverScreen.style.display = 'flex'; // Show game over screen
-        }
-
-        // Restart button event listener
-        restartButton.addEventListener('click', initializeGame);
-
-        // Initial setup - wait for images to load
-        // The initializeGame() call is now inside imageLoaded()
+        });
     </script>
+
 </body>
 </html>
